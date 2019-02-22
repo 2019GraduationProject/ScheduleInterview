@@ -12,9 +12,11 @@ protocol UserService{
     
     func checkUser(vo: LoginInfo) -> ReturnGenericity<String>
     
-    func getUserInfoByID(vo: UserIDInfo) -> ReturnGenericity<Any>
+    func getUserInfoByID(vo: UserIDInfo) -> ReturnGenericity<UserInfo>
     
-    func getUserInfoByName(vo: UserNameInfo) -> ReturnGenericity<Any>
+    func getUserInfoByName(vo: UserNameInfo) -> ReturnGenericity<UserInfo>
     
-    func modifyUserInfo(vo: UserInfo) -> ReturnGenericity<Any>
+    func modifyUserInfo(vo: UserInfo) -> ReturnGenericity<String>
+    
+    func resetPassword(vo: NewPasswordInfo) -> ReturnGenericity<String>
 }

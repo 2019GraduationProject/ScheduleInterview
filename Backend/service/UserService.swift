@@ -16,7 +16,7 @@ protocol UserService{
     
     func getUserInfoByName(vo: UserNameInfo) -> ReturnGenericity<UserInfo>
     
-    func modifyUserInfo(vo: UserInfo) -> ReturnGenericity<String>
+    func modifyUserInfo(vo: UserInfoChanging) -> ReturnGenericity<String>
     
     func resetPassword(vo: NewPasswordInfo) -> ReturnGenericity<String>
 }

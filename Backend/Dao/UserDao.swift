@@ -10,7 +10,7 @@ import PerfectMySQL
 
 class UserDao{
     let connector:Connector = Connector()
-    
+
     
     /// add user
     ///
@@ -21,8 +21,10 @@ class UserDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
+        
+        let userName: String = "user\(vo.phone)"
     
-        let createQuery = mysql!.query(statement: "insert into `users` (`userName`, `password`, `phone`) values ('\(vo.userName)', '\(vo.password)', '\(vo.phone)')")
+        let createQuery = mysql!.query(statement: "insert into `users` (`userName`, `password`, `phone`) values ('\(userName)', '\(vo.password)', '\(vo.phone)')")
         
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "phone exist", info: "")
@@ -55,26 +57,27 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let getQuery = mysql!.query(statement: "SELECT `password` from users where `userID`='\(vo.userID)'")
+        let getQuery = mysql!.query(statement: "SELECT `password`, `userID` from users where `phone`='\(vo.phone)'")
         guard getQuery else {
             return ReturnGenericity<String>(state: false, message: "no such user", info: "")
         }
         
         let res = mysql!.storeResults()!
         var password: String = ""
+        var userID: String = ""
         
         res.forEachRow { row in
-            password = row.first!!
+            password = row[0]!
+            userID = row[1]!
         }
         
         guard vo.password == password else{
             return ReturnGenericity<String>(state: false, message: "password wrong", info: "")
         }
         
-        return ReturnGenericity<String>(state: true, message: "success", info: "")
+        return ReturnGenericity<String>(state: true, message: "success", info: userID)
         
     }
-    
     
     /// get user info by ID
     ///
@@ -99,6 +102,8 @@ class UserDao{
             userInfo.userName = row[1]!
             userInfo.password = row[2]!
             userInfo.phone = row[3]!
+            userInfo.gender = (row[4]! as NSString).boolValue
+            userInfo.introduction = row[5]!
         }
         
         return ReturnGenericity<UserInfo>(info: userInfo)
@@ -128,6 +133,8 @@ class UserDao{
             userInfo.userName = row[1]!
             userInfo.password = row[2]!
             userInfo.phone = row[3]!
+            userInfo.gender = (row[4]! as NSString).boolValue
+            userInfo.introduction = row[5]!
         }
         
         return ReturnGenericity<UserInfo>(info: userInfo)
@@ -144,7 +151,7 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let changeQuery = mysql!.query(statement: "UPDATE on users set `userName`=\(vo.userName) where `userID`=\(vo.userID)")
+        let changeQuery = mysql!.query(statement: "UPDATE on users set `userName`=\(vo.userName) and `gender`=\(vo.gender) and `introduction`=\(vo.introduction) where `userID`=\(vo.userID)")
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
         }

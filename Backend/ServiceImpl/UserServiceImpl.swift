@@ -27,7 +27,7 @@ class UserServiceImpl: UserService {
         return userDao.getUserInfoByName(vo: vo)
     }
 
-    func modifyUserInfo(vo: UserInfo) -> ReturnGenericity<String> {
+    func modifyUserInfo(vo: UserInfoChanging) -> ReturnGenericity<String> {
        return userDao.changeUserInfo(vo:vo)
     }
 

@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.24)
 # Database: ScheduleInterview
-# Generation Time: 2019-02-22 03:08:21 +0000
+# Generation Time: 2019-03-23 05:23:06 +0000
 # ************************************************************
 
 
@@ -184,7 +184,8 @@ LOCK TABLES `users` WRITE;
 
 INSERT INTO `users` (`userID`, `userName`, `password`, `phone`)
 VALUES
-	(00000001,'root','123','13862735550');
+	(00000001,'root','123','13862735550'),
+	(00000006,'test','111','1234567890');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;

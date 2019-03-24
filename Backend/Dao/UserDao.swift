@@ -24,12 +24,16 @@ class UserDao{
         
         let userName: String = "user\(vo.phone)"
     
-        let createQuery = mysql!.query(statement: "insert into `users` (`userName`, `password`, `phone`) values ('\(userName)', '\(vo.password)', '\(vo.phone)')")
+        let createQuery = mysql!.query(statement: """
+            INSERT INTO `users` (`userName`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)')
+            """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "phone exist", info: "")
         }
         
-        let getQuery = mysql!.query(statement: "SELECT `userID` from users where `phone`='\(vo.phone)'")
+        let getQuery = mysql!.query(statement: """
+            SELECT `userID` FROM `users` WHERE `phone`='\(vo.phone)'
+            """)
         guard getQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
         }
@@ -54,7 +58,9 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let getQuery = mysql!.query(statement: "SELECT `password`, `userID` from users where `phone`='\(vo.phone)'")
+        let getQuery = mysql!.query(statement: """
+            SELECT `password`, `userID` FROM `users` WHERE `phone`='\(vo.phone)'
+            """)
         guard getQuery else {
             return ReturnGenericity<String>(state: false, message: "no such user", info: "")
         }
@@ -86,7 +92,9 @@ class UserDao{
             return ReturnGenericity<UserInfo>(state: false, message: "connect database failed", info: UserInfo())
         }
         
-        let getQuery = mysql!.query(statement: "SELECT * from users where `userID`='\(vo.userID)'")
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `users` WHERE `userID`='\(vo.userID)'
+            """)
         guard getQuery else {
             return ReturnGenericity<UserInfo>(state: false, message: "no such user", info: UserInfo())
         }
@@ -117,7 +125,9 @@ class UserDao{
             return ReturnGenericity<UserInfo>(state: false, message: "connect database failed", info: UserInfo())
         }
         
-        let getQuery = mysql!.query(statement: "SELECT * from users where `userID`='\(vo.userName)'")
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `users` WHERE `userName`='\(vo.userName)'
+            """)
         guard getQuery else {
             return ReturnGenericity<UserInfo>(state: false, message: "no such user", info: UserInfo())
         }
@@ -148,7 +158,9 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let changeQuery = mysql!.query(statement: "UPDATE on users set `userName`=\(vo.userName) and `gender`=\(vo.gender) and `introduction`=\(vo.introduction) where `userID`=\(vo.userID)")
+        let changeQuery = mysql!.query(statement: """
+            UPDATE `users` SET `userName`=\(vo.userName), `gender`=\(vo.gender), `introduction`=\(vo.introduction) WHERE `userID`=\(vo.userID)
+            """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
         }
@@ -167,7 +179,9 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let changeQuery = mysql!.query(statement: "UPDATE on users set `password`=\(vo.password) where `userID`=\(vo.userID)")
+        let changeQuery = mysql!.query(statement: """
+            UPDATE `users` SET `password`=\(vo.password) WHERE `userID`=\(vo.userID)
+            """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
         }

@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.7.24)
 # Database: ScheduleInterview
-# Generation Time: 2019-03-24 01:43:39 +0000
+# Generation Time: 2019-03-24 08:13:45 +0000
 # ************************************************************
 
 
@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `event_00000001`;
 CREATE TABLE `event_00000001` (
   `clauseID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`clauseID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
@@ -43,7 +43,7 @@ CREATE TABLE `events` (
   PRIMARY KEY (`eventID`),
   KEY `publisherID` (`publisherID`),
   CONSTRAINT `events_ibfk_1` FOREIGN KEY (`publisherID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `events` WRITE;
 /*!40000 ALTER TABLE `events` DISABLE KEYS */;
@@ -64,7 +64,7 @@ DROP TABLE IF EXISTS `g_event_00000001`;
 CREATE TABLE `g_event_00000001` (
   `clauseID` int(8) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`clauseID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
@@ -80,7 +80,7 @@ CREATE TABLE `group_00000001` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `memberID` (`memberID`),
   CONSTRAINT `group_00000001_ibfk_2` FOREIGN KEY (`memberID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `group_00000001` WRITE;
 /*!40000 ALTER TABLE `group_00000001` DISABLE KEYS */;
@@ -107,7 +107,7 @@ CREATE TABLE `group_events` (
   KEY `publisher` (`publisher`),
   CONSTRAINT `group_events_ibfk_1` FOREIGN KEY (`groupID`) REFERENCES `groups` (`groupID`),
   CONSTRAINT `group_events_ibfk_2` FOREIGN KEY (`publisher`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `group_events` WRITE;
 /*!40000 ALTER TABLE `group_events` DISABLE KEYS */;
@@ -134,7 +134,7 @@ CREATE TABLE `groups` (
   UNIQUE KEY `groupName` (`groupName`),
   KEY `creatorID` (`creatorID`),
   CONSTRAINT `groups_ibfk_1` FOREIGN KEY (`creatorID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `groups` WRITE;
 /*!40000 ALTER TABLE `groups` DISABLE KEYS */;
@@ -164,7 +164,7 @@ CREATE TABLE `invitation` (
   CONSTRAINT `invitation_ibfk_1` FOREIGN KEY (`groupID`) REFERENCES `groups` (`groupID`),
   CONSTRAINT `invitation_ibfk_2` FOREIGN KEY (`inviterID`) REFERENCES `users` (`userID`),
   CONSTRAINT `invitation_ibfk_3` FOREIGN KEY (`inviteeID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
@@ -182,14 +182,14 @@ CREATE TABLE `users` (
   `introduction` varchar(256) NOT NULL DEFAULT '',
   PRIMARY KEY (`userID`),
   UNIQUE KEY `phone` (`phone`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
 
 INSERT INTO `users` (`userID`, `userName`, `password`, `phone`, `gender`, `introduction`)
 VALUES
-	(00000001,'root','123','13862735550',1,'root user'),
+	(00000001,'root','123','13862735550',0,'root用户'),
 	(00000006,'test','111','1234567890',1,'test user');
 
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;

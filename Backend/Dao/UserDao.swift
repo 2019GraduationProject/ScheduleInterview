@@ -25,20 +25,17 @@ class UserDao{
         let userName: String = "user\(vo.phone)"
     
         let createQuery = mysql!.query(statement: "insert into `users` (`userName`, `password`, `phone`) values ('\(userName)', '\(vo.password)', '\(vo.phone)')")
-        
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "phone exist", info: "")
         }
         
         let getQuery = mysql!.query(statement: "SELECT `userID` from users where `phone`='\(vo.phone)'")
-        
         guard getQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
         }
         
         let res = mysql!.storeResults()!
         var userID: String = ""
-        
         res.forEachRow { row in
             userID = row.first!!
         }
@@ -106,7 +103,7 @@ class UserDao{
             userInfo.introduction = row[5]!
         }
         
-        return ReturnGenericity<UserInfo>(info: userInfo)
+        return ReturnGenericity<UserInfo>(state: true, message: "success", info: userInfo)
     }
     
     
@@ -137,7 +134,7 @@ class UserDao{
             userInfo.introduction = row[5]!
         }
         
-        return ReturnGenericity<UserInfo>(info: userInfo)
+        return ReturnGenericity<UserInfo>(state: true, message: "success", info: userInfo)
     }
     
     

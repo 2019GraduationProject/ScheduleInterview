@@ -93,7 +93,7 @@ class UserDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT * FROM `users` WHERE `userID`='\(vo.userID)'
+            SELECT * FROM `users` WHERE `userID`=\(vo.userID)
             """)
         guard getQuery else {
             return ReturnGenericity<UserInfo>(state: false, message: "no such user", info: UserInfo())
@@ -159,7 +159,7 @@ class UserDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `users` SET `userName`=\(vo.userName), `gender`=\(vo.gender), `introduction`=\(vo.introduction) WHERE `userID`=\(vo.userID)
+            UPDATE `users` SET `userName`='\(vo.userName)', `gender`=\(vo.gender), `introduction`='\(vo.introduction)' WHERE `userID`=\(vo.userID)
             """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
@@ -180,7 +180,7 @@ class UserDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `users` SET `password`=\(vo.password) WHERE `userID`=\(vo.userID)
+            UPDATE `users` SET `password`='\(vo.password)' WHERE `userID`=\(vo.userID)
             """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")

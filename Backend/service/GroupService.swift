@@ -8,11 +8,11 @@
 import Foundation
 
 protocol GroupService{
-    func createGroup(vo: NewGroupInfo) -> ReturnGenericity<Any>
+    func createGroup(vo: NewGroupInfo) -> ReturnGenericity<String>
     
-    func inviteUsers(vo: InviteUsersInfo) -> ReturnGenericity<Any>
+    func inviteUsers(vo: InvitationInfo) -> ReturnGenericity<String>
     
-    func acceptInvitation(vo: InvitationInfo) -> ReturnGenericity<Any>
+    func acceptInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String>
     
-    func refuseInvitation(vo: InvitationInfo) -> ReturnGenericity<Any>
+    func refuseInvitation(vo: InvitationIDInfo) -> ReturnGenericity<String>
 }

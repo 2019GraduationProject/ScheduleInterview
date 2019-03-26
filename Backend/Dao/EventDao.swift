@@ -168,8 +168,8 @@ class EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `events`
-            SET `eventName` = '\(vo.eventName)', `start` = '\(vo.start)', `end` = '\(vo.end)', `brief` = '\(vo.brief)'
-            WHERE `eventID` = '\(vo.eventID)'
+                SET `eventName` = '\(vo.eventName)', `start` = '\(vo.start)', `end` = '\(vo.end)', `brief` = '\(vo.brief)'
+                WHERE `eventID` = '\(vo.eventID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: "")
@@ -190,8 +190,8 @@ class EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `g_events_\(vo.eventID)`
-            SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
-            WHERE `clauseID` = '\(vo.clauseID)'
+                SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
+                WHERE `clauseID` = '\(vo.clauseID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -213,8 +213,8 @@ class EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `g_events_\(vo.eventID)`
-            SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
-            WHERE `clauseID` = '\(vo.clauseID)'
+                SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
+                WHERE `clauseID` = '\(vo.clauseID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")

@@ -24,18 +24,12 @@ class UserDao{
         
         let userName: String = "user\(vo.phone)"
     
-        let createQuery = mysql!.query(statement: """
-            INSERT INTO `users` (`userName`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)')
+        let createAndGetQuery = mysql!.query(statement: """
+            INSERT INTO `users` (`userName`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)');
+            SELECT `userID` FROM `users` WHERE `phone`='\(vo.phone)';
             """)
-        guard createQuery else {
-            return ReturnGenericity<String>(state: false, message: "phone exist", info: "")
-        }
-        
-        let getQuery = mysql!.query(statement: """
-            SELECT `userID` FROM `users` WHERE `phone`='\(vo.phone)'
-            """)
-        guard getQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+        guard createAndGetQuery else {
+            return ReturnGenericity<String>(state: false, message: "phone exist or database wrong", info: "")
         }
         
         let res = mysql!.storeResults()!
@@ -51,7 +45,7 @@ class UserDao{
     /// user login
     ///
     /// - Parameter vo: log in vo
-    /// - Returns: success/false
+    /// - Returns: success/fail
     func checkUser(vo: LoginInfo) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
@@ -93,7 +87,7 @@ class UserDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT * FROM `users` WHERE `userID`=\(vo.userID)
+            SELECT * FROM `users` WHERE `userID`='\(vo.userID)'
             """)
         guard getQuery else {
             return ReturnGenericity<UserInfo>(state: false, message: "no such user", info: UserInfo())
@@ -151,7 +145,7 @@ class UserDao{
     /// change user info
     ///
     /// - Parameter vo: user info
-    /// - Returns: success/false
+    /// - Returns: success/fail
     func changeUserInfo(vo: UserInfoChanging) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
@@ -159,7 +153,7 @@ class UserDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `users` SET `userName`='\(vo.userName)', `gender`=\(vo.gender), `introduction`='\(vo.introduction)' WHERE `userID`=\(vo.userID)
+            UPDATE `users` SET `userName`='\(vo.userName)', `gender`='\(vo.gender)', `introduction`='\(vo.introduction)' WHERE `userID`='\(vo.userID)'
             """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
@@ -172,7 +166,7 @@ class UserDao{
     /// reset password
     ///
     /// - Parameter vo: userid, new password
-    /// - Returns: success/false
+    /// - Returns: success/fail
     func resetPassword(vo: NewPasswordInfo) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
@@ -180,7 +174,7 @@ class UserDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `users` SET `password`='\(vo.password)' WHERE `userID`=\(vo.userID)
+            UPDATE `users` SET `password`='\(vo.password)' WHERE `userID`='\(vo.userID)'
             """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")

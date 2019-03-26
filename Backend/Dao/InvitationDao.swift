@@ -46,8 +46,8 @@ class InvitationDao{
         }
         
         let handleQuery = mysql!.query(statement: """
-            DELETE FROM `invitation` WHERE `invitationID` = \(vo.invitationID);
-            INSERT INTO `group_\(vo.groupID)`(`memberID`, `authLv`) VALUES (\(vo.userID), \(AuthLevel.MEMBER));
+            DELETE FROM `invitation` WHERE `invitation_id` = \(vo.invitationID);
+            INSERT INTO `group_\(vo.groupID)`(`member_id`, `auth_level`) VALUES (\(vo.userID), \(AuthLevel.MEMBER));
             """)
         guard handleQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
@@ -68,7 +68,7 @@ class InvitationDao{
         }
         
         let handleQuery = mysql!.query(statement: """
-            DELETE FROM `invitation` WHERE `invitationID` = \(vo.invitationID);
+            DELETE FROM `invitation` WHERE `invitation_id` = \(vo.invitationID);
             """)
         guard handleQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: "")

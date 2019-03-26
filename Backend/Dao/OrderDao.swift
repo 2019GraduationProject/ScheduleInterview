@@ -23,7 +23,7 @@ class OrderDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT `numOfMember`, `total`, `members` FROM `g_event_\(vo.eventID)`
+            SELECT `limit`, `total`, `members` FROM `event_group_\(vo.eventID)`
         """)
         guard getQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -47,9 +47,9 @@ class OrderDao{
         members = members + vo.userID
     
         let insertQuery = mysql!.query(statement: """
-            INSERT INTO `group_orders` (`userID`, `groupID`, `eventID`, `clauseID`)
+            INSERT INTO `order_group` (`user_id`, `group_id`, `event_id`, `clause_id`)
                 VALUES ('\(vo.userID)', '\(vo.groupID)', '\(vo.eventID)', '\(vo.clauseID)');
-            UPDATE `g_event_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
         """)
         guard insertQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -70,7 +70,7 @@ class OrderDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT `numOfMember`, `total`, `members` FROM `event_\(vo.eventID)`
+            SELECT `limit`, `total`, `members` FROM `event_global_\(vo.eventID)`
             """)
         guard getQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -94,9 +94,9 @@ class OrderDao{
         members = members + vo.userID
         
         let insertQuery = mysql!.query(statement: """
-            INSERT INTO `global_orders` (`userID`, `eventID`, `clauseID`)
+            INSERT INTO `order_global` (`user_id`, `event_id`, `clause_id`)
                 VALUES ('\(vo.userID)', '\(vo.eventID)', '\(vo.clauseID)');
-            UPDATE `event_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+            UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
             """)
         guard insertQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -117,7 +117,7 @@ class OrderDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT `total`, `members` FROM `group_event_\(vo.eventID)` WHERE `clauseID`  = '\(vo.clauseID)'
+            SELECT `total`, `members` FROM `event_group_\(vo.eventID)` WHERE `clause_id`  = '\(vo.clauseID)'
         """)
         guard getQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -134,8 +134,8 @@ class OrderDao{
         members = cut(members: members, member: vo.userID)
         
         let cutAndDeleteQuery = mysql!.query(statement: """
-            UPDATE `group_event_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
-            DELETE FROM `group_orders` WHERE `orderID` = '\(vo.orderID)'；
+            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
+            DELETE FROM `order_group` WHERE `order_id` = '\(vo.orderID)'；
             """)
         guard cutAndDeleteQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -162,7 +162,7 @@ class OrderDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT `total`, `members` FROM `event_\(vo.eventID)` WHERE `clauseID`  = '\(vo.clauseID)'
+            SELECT `total`, `members` FROM `event_global_\(vo.eventID)` WHERE `clause_id`  = '\(vo.clauseID)'
             """)
         guard getQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -179,8 +179,8 @@ class OrderDao{
         members = cut(members: members, member: vo.userID)
         
         let cutAndDeleteQuery = mysql!.query(statement: """
-            UPDATE `group_event_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
-            DELETE FROM `group_orders` WHERE `orderID` = '\(vo.orderID)'；
+            UPDATE `event_global)\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
+            DELETE FROM `order_global` WHERE `order_id` = '\(vo.orderID)'；
             """)
         guard cutAndDeleteQuery else{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")

@@ -23,8 +23,8 @@ class GroupDao{
         }
         
         let createAndGetQuery = mysql!.query(statement: """
-            INSERT INTO `groups` (`creatorID`, `groupName`, `introduction`) VALUES (\(vo.userID), '\(vo.groupName)', '\(vo.introduction)');
-            SELECT `groupID` FROM `groups` WHERE `groupName`='\(vo.groupName)';
+            INSERT INTO `group` (`creator_id`, `group_name`, `introduction`) VALUES (\(vo.userID), '\(vo.groupName)', '\(vo.introduction)');
+            SELECT `group_id` FROM `group` WHERE `group_name`='\(vo.groupName)';
             """)
         guard createAndGetQuery else {
             return ReturnGenericity<String>(state: false, message: "group exist", info: "")
@@ -39,13 +39,12 @@ class GroupDao{
         
         let createGroupQuery = mysql!.query(statement: """
             CREATE TABLE `group_\(groupID)` (
-                `id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
-                `memberID` int(8) unsigned zerofill NOT NULL,
-                `authLv` int(1) unsigned NOT NULL,
-                PRIMARY KEY (`id`),
-                UNIQUE KEY `memberID` (`memberID`),
-                CONSTRAINT `group_\(groupID)_ibfk_2` FOREIGN KEY (`memberID`) REFERENCES `users` (`userID`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+                `member_id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
+                `user_id` int(8) unsigned zerofill NOT NULL,
+                `auth_level` int(1) unsigned NOT NULL,
+                PRIMARY KEY (`member_id`),
+                UNIQUE KEY `user_id` (`user_id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
             """)
         guard createGroupQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")

@@ -23,9 +23,9 @@ class EventDao{
         }
         
         let createQuery = mysql!.query(statement: """
-            INSERT INTO `group_events` (`groupID`, `publisherID`, `eventName`, `start`, `end`, `brief`)
-                VALUES ('\(vo.groupID)', '\(vo.userID)','\(vo.eventName)', '\(vo.start)', '\(vo.end)', '\(vo.brief)');
-            SELECT `eventID` FROM `group_events` WHERE `groupID`='\(vo.groupID)' AND `eventName` = '\(vo.eventName)';
+            INSERT INTO `event_group` (`group_id`, `publisher_id`, `event_name`, `start_time`, `end_time`, `introduction`)
+                VALUES ('\(vo.groupID)', '\(vo.userID)','\(vo.eventName)', '\(vo.startTime)', '\(vo.endTime)', '\(vo.introduction)');
+            SELECT `event_id` FROM `event_group` WHERE `group_id`='\(vo.groupID)' AND `event_name` = '\(vo.eventName)';
             """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: "")
@@ -38,19 +38,18 @@ class EventDao{
         }
         
         let createInGroupEventQuery = mysql!.query(statement: """
-            CREATE TABLE `g_event_\(eventID)` (
-                `clauseID` int(8) unsigned NOT NULL AUTO_INCREMENT,
-                `clauseName` varchar(256) NOT NULL DEFAULT '',
-                `startTime` datetime NOT NULL,
-                `endTime` datetime NOT NULL,
-                `authLv` int(1) NOT NULL,
-                `brief` varchar(256) NOT NULL DEFAULT '',
-                `numOfMember` int(4) NOT NULL,
+            CREATE TABLE `event_group_\(eventID)` (
+                `clause_id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
+                `clause_name` varchar(256) NOT NULL DEFAULT '',
+                `start_time` datetime NOT NULL,
+                `end_time` datetime NOT NULL,
+                `auth_level` int(1) NOT NULL,
+                `introduction` varchar(256) NOT NULL DEFAULT '',
+                `limit` int(4) NOT NULL,
                 `total` int(4) DEFAULT '0',
                 `members` varchar(1024) DEFAULT '',
-
-                PRIMARY KEY (`clauseID`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+                PRIMARY KEY (`clause_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
             """)
         guard createInGroupEventQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -59,8 +58,8 @@ class EventDao{
         var initInsertQuery = ""
         for clause in vo.clauses {
             initInsertQuery += """
-            INSERT INTO `g_event_\(eventID)` (`clauseName`, `startTime`, `endTime`, `authLv`, `brief`, `numOfMember`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLv)', '\(clause.brief)', '\(clause.numOfMember)');
+            INSERT INTO `event_group_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel)', '\(clause.introduction)', '\(clause.limit)');
             """
         }
         
@@ -84,9 +83,9 @@ class EventDao{
         }
         
         let createQuery = mysql!.query(statement: """
-            INSERT INTO `events` (`publisherID`, `eventName`, `start`, `end`, `brief`)
-                VALUES ('\(vo.userID)','\(vo.eventName)', '\(vo.start)', '\(vo.end)', '\(vo.brief)');
-            SELECT `eventID` FROM `events` WHERE `eventName` = '\(vo.eventName)';
+            INSERT INTO `event_global` (`publisher_id`, `event_name`, `start_time`, `end_time`, `introduction`)
+                VALUES ('\(vo.userID)','\(vo.eventName)', '\(vo.startTime)', '\(vo.endTime)', '\(vo.introduction)');
+            SELECT `event_id` FROM `event_global` WHERE `event_name` = '\(vo.eventName)';
             """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: "")
@@ -99,18 +98,18 @@ class EventDao{
         }
         
         let createInGroupEventQuery = mysql!.query(statement: """
-            CREATE TABLE `event_\(eventID)` (
-                `clauseID` int(8) unsigned NOT NULL AUTO_INCREMENT,
-                `clauseName` varchar(256) NOT NULL DEFAULT '',
-                `startTime` datetime NOT NULL,
-                `endTime` datetime NOT NULL,
-                `authLv` int(1) NOT NULL,
-                `brief` varchar(256) NOT NULL DEFAULT '',
-                `numOfMember` int(4) NOT NULL,
-                `total` int(4) DEFAULT '0',
-                `members` varchar(1024) DEFAULT '',
-            PRIMARY KEY (`clauseID`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+            CREATE TABLE `event_global_\(eventID)` (
+            `clause_id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
+            `clause_name` varchar(256) NOT NULL DEFAULT '',
+            `start_time` datetime NOT NULL,
+            `end_time` datetime NOT NULL,
+            `auth_level` int(1) NOT NULL,
+            `introduction` varchar(256) NOT NULL DEFAULT '',
+            `limit` int(4) NOT NULL,
+            `total` int(4) DEFAULT '0',
+            `members` varchar(1024) DEFAULT '',
+            PRIMARY KEY (`clause_id`)
+            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
             """)
         guard createInGroupEventQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -119,8 +118,8 @@ class EventDao{
         var initInsertQuery = ""
         for clause in vo.clauses {
             initInsertQuery += """
-            INSERT INTO `event_\(eventID)` (`clauseName`, `startTime`, `endTime`, `authLv`, `brief`, `numOfMember`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLv)', '\(clause.brief)', '\(clause.numOfMember)');
+            INSERT INTO `event_global_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel)', '\(clause.introduction)', '\(clause.limit)');
             """
         }
         
@@ -144,9 +143,9 @@ class EventDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `group_events`
-                SET `eventName` = '\(vo.eventName)', `start` = '\(vo.start)', `end` = '\(vo.end)', `brief` = '\(vo.brief)'
-                WHERE `eventID` = '\(vo.eventID)'
+            UPDATE `event_group`
+                SET `event_name` = '\(vo.eventName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', `introduction` = '\(vo.introduction)'
+                WHERE `event_id` = '\(vo.eventID)'
         """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -167,9 +166,9 @@ class EventDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `events`
-                SET `eventName` = '\(vo.eventName)', `start` = '\(vo.start)', `end` = '\(vo.end)', `brief` = '\(vo.brief)'
-                WHERE `eventID` = '\(vo.eventID)'
+            UPDATE `event_global`
+                SET `event_name` = '\(vo.eventName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', `introduction` = '\(vo.introduction)'
+                WHERE `event_id` = '\(vo.eventID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: "")
@@ -189,9 +188,9 @@ class EventDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `g_events_\(vo.eventID)`
-                SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
-                WHERE `clauseID` = '\(vo.clauseID)'
+            UPDATE `events_group_\(vo.eventID)`
+                SET `clause_Name` = '\(vo.clauseName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', ` introduction` = '\(vo.introduction)'
+                WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -212,9 +211,9 @@ class EventDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `g_events_\(vo.eventID)`
-                SET `clauseName` = '\(vo.clauseName)', `startTime` = '\(vo.startTime)', `endTime` = '\(vo.endTime)', ` brief` = '\(vo.brief)'
-                WHERE `clauseID` = '\(vo.clauseID)'
+            UPDATE `event_global_\(vo.eventID)`
+                SET `clause_name` = '\(vo.clauseName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', ` introduction` = '\(vo.introduction)'
+                WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard changeQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -234,8 +233,8 @@ class EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `group_events` WHERE `eventID` = '\(vo.eventID)';
-            DROP TABLE `g_event_\(vo.eventID)`;
+            DELETE FROM `event_group` WHERE `event_id` = '\(vo.eventID)';
+            DROP TABLE `event_group_\(vo.eventID)`;
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -256,8 +255,8 @@ class EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `events` WHERE `eventID` = '\(vo.eventID)';
-            DROP TABLE `event_\(vo.eventID)`;
+            DELETE FROM `event_global` WHERE `event_id` = '\(vo.eventID)';
+            DROP TABLE `event_global_\(vo.eventID)`;
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -277,7 +276,7 @@ class EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `g_events_\(vo.eventID)` WHERE `clauseID` = '\(vo.clauseID)'
+            DELETE FROM `events_group_\(vo.eventID)` WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -298,7 +297,7 @@ class EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `events_\(vo.eventID)` WHERE `clauseID` = '\(vo.clauseID)'
+            DELETE FROM `event_global_\(vo.eventID)` WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")

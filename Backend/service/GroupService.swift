@@ -14,5 +14,5 @@ protocol GroupService{
     
     func acceptInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String>
     
-    func refuseInvitation(vo: InvitationIDInfo) -> ReturnGenericity<String>
+    func refuseInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String>
 }

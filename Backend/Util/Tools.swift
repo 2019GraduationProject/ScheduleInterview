@@ -12,4 +12,17 @@ enum AuthLevel: Int {
     case MANAGER = 4
     case VIPMEMBER = 2
     case MEMBER = 1
+    
+    func getValue() -> Int {
+        return self.rawValue
+    }
+}
+
+enum KindOfEvent: String {
+    case GROUP = "group"
+    case GLOBAL = "global"
+    
+    func getValue() -> String {
+        return self.rawValue
+    }
 }

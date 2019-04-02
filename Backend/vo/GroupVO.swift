@@ -46,11 +46,3 @@ struct InvitationHandleInfo {
         self.userID = userID
     }
 }
-
-struct InvitationIDInfo {
-    var invitationID: String
-    
-    init(invitationID: String) {
-        self.invitationID = invitationID
-    }
-}

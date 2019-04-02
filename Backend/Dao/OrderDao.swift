@@ -11,7 +11,6 @@ import PerfectMySQL
 class OrderDao{
     let connector: Connector = Connector()
     
-    
     /// add group clause order
     ///
     /// - Parameter vo: group order
@@ -26,7 +25,7 @@ class OrderDao{
             SELECT `limit`, `total`, `members` FROM `event_group_\(vo.eventID)`
         """)
         guard getQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         let res = mysql!.storeResults()!
@@ -48,11 +47,17 @@ class OrderDao{
     
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `order_group` (`user_id`, `group_id`, `event_id`, `clause_id`)
-                VALUES ('\(vo.userID)', '\(vo.groupID)', '\(vo.eventID)', '\(vo.clauseID)');
-            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+                VALUES ('\(vo.userID)', '\(vo.groupID)', '\(vo.eventID)', '\(vo.clauseID)')
         """)
         guard insertQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        let updateQuery = mysql!.query(statement: """
+            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+            """)
+        guard updateQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -95,11 +100,17 @@ class OrderDao{
         
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `order_global` (`user_id`, `event_id`, `clause_id`)
-                VALUES ('\(vo.userID)', '\(vo.eventID)', '\(vo.clauseID)');
-            UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+                VALUES ('\(vo.userID)', '\(vo.eventID)', '\(vo.clauseID)')
             """)
         guard insertQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        let updateQuery = mysql!.query(statement: """
+            UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
+            """)
+        guard updateQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -133,12 +144,18 @@ class OrderDao{
         total = total - 1
         members = cut(members: members, member: vo.userID)
         
-        let cutAndDeleteQuery = mysql!.query(statement: """
-            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
-            DELETE FROM `order_group` WHERE `order_id` = '\(vo.orderID)'；
+        let cutQuery = mysql!.query(statement: """
+            UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
             """)
-        guard cutAndDeleteQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+        guard cutQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        let deleteQuery = mysql!.query(statement: """
+            DELETE FROM `order_group` WHERE `order_id` = '\(vo.orderID)'
+            """)
+        guard deleteQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -178,12 +195,18 @@ class OrderDao{
         total = total - 1
         members = cut(members: members, member: vo.userID)
         
-        let cutAndDeleteQuery = mysql!.query(statement: """
-            UPDATE `event_global)\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)';
-            DELETE FROM `order_global` WHERE `order_id` = '\(vo.orderID)'；
+        let cutQuery = mysql!.query(statement: """
+            UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)', `members` = '\(members)'
             """)
-        guard cutAndDeleteQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+        guard cutQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        let deleteQuery = mysql!.query(statement: """
+            DELETE FROM `order_global` WHERE `order_id` = '\(vo.orderID)'
+            """)
+        guard deleteQuery else{
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")

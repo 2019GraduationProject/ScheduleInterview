@@ -23,7 +23,7 @@ class GroupServiceImpl: GroupService{
         return invitationDao.acceptInvitation(vo: vo)
     }
     
-    func refuseInvitation(vo: InvitationIDInfo) -> ReturnGenericity<String> {
+    func refuseInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String> {
         return invitationDao.refuseInvitation(vo: vo)
     }
     

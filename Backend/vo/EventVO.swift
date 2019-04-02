@@ -7,7 +7,6 @@
 
 import Foundation
 
-// brief: brief introduction
 struct newClause {
     var clauseName: String
     var startTime: Date
@@ -26,16 +25,16 @@ struct newClause {
     }
 }
 
-struct NewInGroupEventInfo{
+struct NewEventInfo{
     var userID: String
-    var groupID: String
+    var groupID: String?
     var eventName: String
     var startTime: Date
     var endTime: Date
     var introduction: String
     var clauses: [newClause]
-
-    init(userID: String, groupID: String, eventName: String, startTime: Date, endTime: Date , introduction: String, clauses: [newClause]) {
+    
+    init(userID: String, groupID: String?, eventName: String, startTime: Date, endTime: Date , introduction: String, clauses: [newClause]) {
         self.userID = userID
         self.groupID = groupID
         self.eventName = eventName
@@ -46,25 +45,7 @@ struct NewInGroupEventInfo{
     }
 }
 
-struct NewGlobalEventInfo {
-    var userID: String
-    var eventName: String
-    var startTime: Date
-    var endTime: Date
-    var introduction: String
-    var clauses: [newClause]
-    
-    init(userID: String, eventName: String, startTime: Date, endTime: Date ,introduction: String, clauses: [newClause]) {
-        self.userID = userID
-        self.eventName = eventName
-        self.startTime = startTime
-        self.endTime = endTime
-        self.introduction = introduction
-        self.clauses = clauses
-    }
-}
-
-struct InGroupEventInfo {
+struct EventInfo {
     var eventID: String
     var eventName: String
     var startTime: Date
@@ -80,7 +61,7 @@ struct InGroupEventInfo {
     }
 }
 
-struct InGroupClauseInfo {
+struct ClauseInfo {
     var eventID: String
     var clauseID: String
     var clauseName: String
@@ -98,64 +79,14 @@ struct InGroupClauseInfo {
     }
 }
 
-struct GlobalEventInfo {
-    var eventID: String
-    var eventName: String
-    var startTime: Date
-    var endTime: Date
-    var introduction: String
-    
-    init(eventID: String, eventName: String, startTime: Date, endTime: Date ,introduction: String) {
-        self.eventID = eventID
-        self.eventName = eventName
-        self.startTime = startTime
-        self.endTime = endTime
-        self.introduction = introduction
-    }
-}
-
-struct GlobalClauseInfo {
-    var eventID: String
-    var clauseID: String
-    var clauseName: String
-    var startTime: Date
-    var endTime: Date
-    var introduction: String
-    
-    init(eventID:String, clauseID: String, clauseName: String, startTime: Date, endTime: Date, introduction: String) {
-        self.eventID = eventID
-        self.clauseID = clauseID
-        self.clauseName = clauseName
-        self.startTime = startTime
-        self.endTime = endTime
-        self.introduction = introduction
-    }
-}
-
-struct InGroupEventIDInfo {
+struct EventIDInfo {
     var eventID: String
     init(eventID: String) {
         self.eventID = eventID
     }
 }
 
-struct GlobalEventIDInfo {
-    var eventID: String
-    init(eventID: String) {
-        self.eventID = eventID
-    }
-}
-
-struct InGroupClauseIDInfo {
-    var eventID: String
-    var clauseID: String
-    init(eventID:String, clauseID:String) {
-        self.eventID = eventID
-        self.clauseID = clauseID
-    }
-}
-
-struct GlobalClauseIDInfo {
+struct ClauseIDInfo {
     var eventID: String
     var clauseID: String
     init(eventID:String, clauseID:String) {

@@ -8,7 +8,7 @@
 import Foundation
 import PerfectMySQL
 
-final class Connector{
+final class Connector{    
     init() {
     }
     

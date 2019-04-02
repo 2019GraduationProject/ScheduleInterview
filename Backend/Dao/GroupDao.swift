@@ -10,7 +10,6 @@ import PerfectMySQL
 
 class GroupDao{
     let connector:Connector = Connector()
-
     
     /// add group
     ///
@@ -22,12 +21,18 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let createAndGetQuery = mysql!.query(statement: """
-            INSERT INTO `group` (`creator_id`, `group_name`, `introduction`) VALUES (\(vo.userID), '\(vo.groupName)', '\(vo.introduction)');
-            SELECT `group_id` FROM `group` WHERE `group_name`='\(vo.groupName)';
+        let createQuery = mysql!.query(statement: """
+            INSERT INTO `group` (`creator_id`, `group_name`, `introduction`) VALUES (\(vo.userID), '\(vo.groupName)', '\(vo.introduction)')
             """)
-        guard createAndGetQuery else {
-            return ReturnGenericity<String>(state: false, message: "group exist", info: "")
+        guard createQuery else {
+            return ReturnGenericity<String>(state: false, message: "group exist", info: mysql!.errorMessage())
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT `group_id` FROM `group` WHERE `group_name`='\(vo.groupName)'
+            """)
+        guard getQuery else {
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         let res = mysql!.storeResults()!
@@ -47,7 +52,7 @@ class GroupDao{
             ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
             """)
         guard createGroupQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: groupID)

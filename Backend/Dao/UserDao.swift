@@ -9,8 +9,7 @@ import Foundation
 import PerfectMySQL
 
 class UserDao{
-    let connector:Connector = Connector()
-
+    let connector:Connector  = Connector()
     
     /// add user
     ///
@@ -24,12 +23,18 @@ class UserDao{
         
         let userName: String = "user\(vo.phone)"
     
-        let createAndGetQuery = mysql!.query(statement: """
-            INSERT INTO `user` (`user_name`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)');
-            SELECT `user_id` FROM `user` WHERE `phone`='\(vo.phone)';
+        let createQuery = mysql!.query(statement: """
+            INSERT INTO `user` (`user_name`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)')
             """)
-        guard createAndGetQuery else {
-            return ReturnGenericity<String>(state: false, message: "phone exist or database wrong", info: "")
+        guard createQuery else {
+            return ReturnGenericity<String>(state: false, message: "phone exist", info: mysql!.errorMessage())
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT `user_id` FROM `user` WHERE `phone`='\(vo.phone)'
+            """)
+        guard getQuery else {
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
         let res = mysql!.storeResults()!
@@ -40,7 +45,6 @@ class UserDao{
         
         return ReturnGenericity<String>(state: true, message: "success", info: userID)
     }
-    
     
     /// user login
     ///
@@ -56,7 +60,7 @@ class UserDao{
             SELECT `password`, `user_id` FROM `user` WHERE `phone`='\(vo.phone)'
             """)
         guard getQuery else {
-            return ReturnGenericity<String>(state: false, message: "no such user", info: "")
+            return ReturnGenericity<String>(state: false, message: "no such user", info: mysql!.errorMessage())
         }
         
         let res = mysql!.storeResults()!
@@ -69,7 +73,7 @@ class UserDao{
         }
         
         guard vo.password == password else{
-            return ReturnGenericity<String>(state: false, message: "password wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "password wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: userID)
@@ -156,7 +160,7 @@ class UserDao{
             UPDATE `user` SET `user_name`='\(vo.userName)', `gender`='\(vo.gender)', `introduction`='\(vo.introduction)' WHERE `user_id`='\(vo.userID)'
             """)
         guard changeQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -177,7 +181,7 @@ class UserDao{
             UPDATE `user` SET `password`='\(vo.password)' WHERE `user_id`='\(vo.userID)'
             """)
         guard changeQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: "")
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")

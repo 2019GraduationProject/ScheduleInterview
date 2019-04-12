@@ -10,28 +10,42 @@ import Foundation
 class UserServiceImpl: UserService {
     
     let userDao = UserDao()
+    let invitationDao = InvitationDao()
+    let groupDao = GroupDao()
     
-    func addUser(vo: SignupInfo) -> ReturnGenericity<String> {
-        return userDao.createUser(vo: vo)
+    func addUser(vo: NewUser) -> ReturnGenericity<String> {
+        return userDao.insertUser(vo: vo)
     }
     
-    func checkUser(vo: LoginInfo) -> ReturnGenericity<String> {
-        return userDao.checkUser(vo: vo)
+    func checkUser(vo: CheckUser) -> ReturnGenericity<String> {
+        return userDao.getPassword(vo: vo)
     }
 
-    func getUserInfoByID(vo: UserIDInfo) -> ReturnGenericity<UserInfo> {
-        return userDao.getUserInfoByID(vo:vo)
+    func getUserInfoByID(vo: UserID) -> ReturnGenericity<UserInfo> {
+        return userDao.getUserByID(vo:vo)
     }
 
-    func getUserInfoByName(vo: UserNameInfo) -> ReturnGenericity<UserInfo> {
-        return userDao.getUserInfoByName(vo: vo)
+    func getUserInfoByPhone(vo: UserPhone) -> ReturnGenericity<UserInfo> {
+        return userDao.getUserByPhone(vo: vo)
     }
 
-    func modifyUserInfo(vo: UserInfoChanging) -> ReturnGenericity<String> {
-       return userDao.changeUserInfo(vo:vo)
+    func modifyUserInfo(vo: UpdateUser) -> ReturnGenericity<String> {
+       return userDao.updateUser(vo:vo)
     }
 
-    func resetPassword(vo: NewPasswordInfo) -> ReturnGenericity<String> {
-        return userDao.resetPassword(vo:vo)
+    func resetPassword(vo: NewPassword) -> ReturnGenericity<String> {
+        return userDao.updatePassword(vo:vo)
+    }
+    
+    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]> {
+        return invitationDao.listInvitations(vo: vo)
+    }
+    
+    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
+        return groupDao.listCreateGroups(vo: vo)
+    }
+    
+    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
+        return groupDao.listJoinGroups(vo: vo)
     }
 }

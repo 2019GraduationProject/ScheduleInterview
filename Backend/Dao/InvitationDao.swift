@@ -16,7 +16,7 @@ class InvitationDao{
     ///
     /// - Parameter vo: invitation info
     /// - Returns: success/fail
-    func createInvitation(vo: InvitationInfo) -> ReturnGenericity<String> {
+    func insertInvitation(vo: NewInvitation) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -39,7 +39,7 @@ class InvitationDao{
     ///
     /// - Parameter vo: invitation info
     /// - Returns: success/fail
-    func acceptInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String> {
+    func insertAcceptInvitation(vo: HandleInvitation) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -74,7 +74,7 @@ class InvitationDao{
     ///
     /// - Parameter vo: invitation id
     /// - Returns: success/fail
-    func refuseInvitation(vo: InvitationHandleInfo) -> ReturnGenericity<String> {
+    func insertRefuseInvitation(vo: HandleInvitation) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -95,6 +95,35 @@ class InvitationDao{
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
+    }
+    
+    /// get invitations
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: invitations
+    func listInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[InvitationInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `invitation` WHERE `invitee_id` = \(vo.userID)
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[InvitationInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var invitation: InvitationInfo = InvitationInfo()
+        var invitations: [InvitationInfo] = []
+        res.forEachRow(callback: {row in
+            invitation.invitationID = row[0]!
+            invitation.groupID = row[1]!
+            invitation.inviterID = row[2]!
+            invitations.append(invitation)
+        })
+        return ReturnGenericity<[InvitationInfo]>(state: true, message: "success", info: invitations)
     }
     
 }

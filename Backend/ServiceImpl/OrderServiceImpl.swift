@@ -10,19 +10,19 @@ import Foundation
 class OrderServiceImpl: OrderService{
     let orderDao: OrderDao = OrderDao()
     
-    func orderInGroupClause(vo: InGroupOrderInfo) -> ReturnGenericity<String> {
-        return orderDao.createInGroupOrder(vo: vo)
+    func orderInGroupClause(vo: NewGroupOrder) -> ReturnGenericity<String> {
+        return orderDao.insertGroupOrder(vo: vo)
     }
     
-    func orderGlobalClause(vo: GlobalOrderInfo) -> ReturnGenericity<String> {
-        return orderDao.createGlobalOrder(vo:vo)
+    func orderGlobalClause(vo: NewGlobalOrder) -> ReturnGenericity<String> {
+        return orderDao.insertGlobalOrder(vo:vo)
     }
     
-    func cancelInGroupClause(vo: InGroupOrderIDInfo) -> ReturnGenericity<String> {
-        return orderDao.deleteInGroupOrder(vo:vo)
+    func cancelInGroupClause(vo: GroupOrderID) -> ReturnGenericity<String> {
+        return orderDao.deleteGroupOrder(vo:vo)
     }
     
-    func cancelGlobalClause(vo: GlobalOrderIDInfo) -> ReturnGenericity<String> {
+    func cancelGlobalClause(vo: GlobalOrderID) -> ReturnGenericity<String> {
         return orderDao.deleteGlobalOrder(vo:vo)
     }
 }

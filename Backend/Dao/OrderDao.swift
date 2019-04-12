@@ -15,7 +15,7 @@ class OrderDao{
     ///
     /// - Parameter vo: group order
     /// - Returns: success/fail
-    func createInGroupOrder(vo: InGroupOrderInfo) -> ReturnGenericity<String> {
+    func insertGroupOrder(vo: NewGroupOrder) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -68,7 +68,7 @@ class OrderDao{
     ///
     /// - Parameter vo: global order
     /// - Returns: success/fail
-    func createGlobalOrder(vo: GlobalOrderInfo) -> ReturnGenericity<String> {
+    func insertGlobalOrder(vo: NewGlobalOrder) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -121,7 +121,7 @@ class OrderDao{
     ///
     /// - Parameter vo: group order id
     /// - Returns: success/fail
-    func deleteInGroupOrder(vo: InGroupOrderIDInfo) -> ReturnGenericity<String> {
+    func deleteGroupOrder(vo: GroupOrderID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -172,7 +172,7 @@ class OrderDao{
     ///
     /// - Parameter vo: global order id
     /// - Returns: success/fail
-    func deleteGlobalOrder(vo: GlobalOrderIDInfo) -> ReturnGenericity<String> {
+    func deleteGlobalOrder(vo: GlobalOrderID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")

@@ -9,17 +9,17 @@ import Foundation
 import PerfectMySQL
 
 protocol EventDao{
-    func createEvent(vo: NewEventInfo) -> ReturnGenericity<String>
+    func insertEvent(vo: NewEvent) -> ReturnGenericity<String>
     
-    func changeEventInfo(vo: EventInfo) -> ReturnGenericity<String>
+    func updateEvent(vo: UpdateEvent) -> ReturnGenericity<String>
     
-    func changeClauseInfo(vo: ClauseInfo) -> ReturnGenericity<String>
+    func updateClause(vo: UpdateClause) -> ReturnGenericity<String>
     
-    func deleteEvent(vo: EventIDInfo) -> ReturnGenericity<String>
+    func deleteEvent(vo: EventID) -> ReturnGenericity<String>
     
-    func deleteClause(vo: ClauseIDInfo) -> ReturnGenericity<String>
+    func deleteClause(vo: ClauseID) -> ReturnGenericity<String>
     
-    func findEvent(vo: EventConditions) -> ReturnGenericity<Any>
+    func listEvents(vo: EventConditions) -> ReturnGenericity<Any>
 }
 
 class EventGroupDaoImpl : EventDao{
@@ -29,15 +29,15 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: new group event info
     /// - Returns: success/fail
-    func createEvent(vo: NewEventInfo) -> ReturnGenericity<String> {
+    func insertEvent(vo: NewEvent) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
         let createQuery = mysql!.query(statement: """
-            INSERT INTO `event_group` (`group_id`, `publisher_id`, `event_name`, `start_time`, `end_time`, `introduction`)
-            VALUES ('\(vo.groupID!)', '\(vo.userID)','\(vo.eventName)', '\(vo.startTime)', '\(vo.endTime)', '\(vo.introduction)')
+            INSERT INTO `event_group` (`group_id`, `publisher_id`, `event_name`, `time`, `location`)
+            VALUES ('\(vo.groupID!)', '\(vo.publisherID)','\(vo.eventName)', '\(vo.time)', '\(vo.location)')
             """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: mysql!.errorMessage())
@@ -96,7 +96,7 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: group event info
     /// - Returns: success/fail
-    func changeEventInfo(vo: EventInfo) -> ReturnGenericity<String> {
+    func updateEvent(vo: UpdateEvent) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -104,7 +104,7 @@ class EventGroupDaoImpl : EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `event_group`
-            SET `event_name` = '\(vo.eventName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', `introduction` = '\(vo.introduction)'
+            SET `event_name` = '\(vo.eventName)', `time` = '\(vo.time)', `location` = '\(vo.location)'
             WHERE `event_id` = '\(vo.eventID)'
             """)
         guard changeQuery else {
@@ -118,7 +118,7 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: group clause info
     /// - Returns: success/fail
-    func changeClauseInfo(vo: ClauseInfo) -> ReturnGenericity<String> {
+    func updateClause(vo: UpdateClause) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -140,7 +140,7 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: group event ID
     /// - Returns: success/fail
-    func deleteEvent(vo: EventIDInfo) -> ReturnGenericity<String> {
+    func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -167,7 +167,7 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: group clause ID
     /// - Returns: success/fail
-    func deleteClause(vo: ClauseIDInfo) -> ReturnGenericity<String> {
+    func deleteClause(vo: ClauseID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -187,7 +187,7 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: <#vo description#>
     /// - Returns: <#return value description#>
-    func findEvent(vo: EventConditions) -> ReturnGenericity<Any> {
+    func listEvents(vo: EventConditions) -> ReturnGenericity<Any> {
         return ReturnGenericity<Any>(info: "")
     }
     
@@ -200,15 +200,15 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: new global event info
     /// - Returns: success/fail
-    func createEvent(vo: NewEventInfo) -> ReturnGenericity<String> {
+    func insertEvent(vo: NewEvent) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
         let createQuery = mysql!.query(statement: """
-            INSERT INTO `event_global` (`publisher_id`, `event_name`, `start_time`, `end_time`, `introduction`)
-                VALUES ('\(vo.userID)','\(vo.eventName)', '\(vo.startTime)', '\(vo.endTime)', '\(vo.introduction)')
+            INSERT INTO `event_global` (`publisher_id`, `event_name`, `time`, `location`)
+                VALUES ('\(vo.publisherID)','\(vo.eventName)', '\(vo.time)', '\(vo.location)')
             """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "event exist", info: mysql!.errorMessage())
@@ -239,7 +239,7 @@ class EventGlobalDaoImpl: EventDao{
             `total` int(4) DEFAULT '0',
             `members` varchar(1024) DEFAULT '',
             PRIMARY KEY (`clause_id`)
-            ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+            ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
             """)
         guard createInGroupEventQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
@@ -267,7 +267,7 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: global event info
     /// - Returns: success/fail
-    func changeEventInfo(vo: EventInfo) -> ReturnGenericity<String> {
+    func updateEvent(vo: UpdateEvent) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -275,7 +275,7 @@ class EventGlobalDaoImpl: EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `event_global`
-                SET `event_name` = '\(vo.eventName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', `introduction` = '\(vo.introduction)'
+                SET `event_name` = '\(vo.eventName)', `time` = '\(vo.time)', `location` = '\(vo.location)'
                 WHERE `event_id` = '\(vo.eventID)'
             """)
         guard changeQuery else {
@@ -289,7 +289,7 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: global clause info
     /// - Returns: success/fail
-    func changeClauseInfo(vo: ClauseInfo) -> ReturnGenericity<String> {
+    func updateClause(vo: UpdateClause) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -311,7 +311,7 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: global event ID
     /// - Returns: success/fail
-    func deleteEvent(vo: EventIDInfo) -> ReturnGenericity<String> {
+    func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -338,7 +338,7 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: global clause ID
     /// - Returns: success/fail
-    func deleteClause(vo: ClauseIDInfo) -> ReturnGenericity<String> {
+    func deleteClause(vo: ClauseID) -> ReturnGenericity<String> {
         let mysql: MySQL? = connector.connected()
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
@@ -358,7 +358,7 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: <#vo description#>
     /// - Returns: <#return value description#>
-    func findEvent(vo: EventConditions) -> ReturnGenericity<Any> {
+    func listEvents(vo: EventConditions) -> ReturnGenericity<Any> {
         return ReturnGenericity<Any>(info: "")
     }
 }

@@ -8,11 +8,11 @@
 import Foundation
 
 protocol OrderService {
-    func orderInGroupClause(vo: InGroupOrderInfo) -> ReturnGenericity<String>
+    func orderInGroupClause(vo: NewGroupOrder) -> ReturnGenericity<String>
     
-    func orderGlobalClause(vo: GlobalOrderInfo) -> ReturnGenericity<String>
+    func orderGlobalClause(vo: NewGlobalOrder) -> ReturnGenericity<String>
   
-    func cancelInGroupClause(vo: InGroupOrderIDInfo) -> ReturnGenericity<String>
+    func cancelInGroupClause(vo: GroupOrderID) -> ReturnGenericity<String>
     
-    func cancelGlobalClause(vo: GlobalOrderIDInfo) -> ReturnGenericity<String>
+    func cancelGlobalClause(vo: GlobalOrderID) -> ReturnGenericity<String>
 }

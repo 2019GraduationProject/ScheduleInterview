@@ -8,15 +8,15 @@
 import Foundation
 
 protocol EventService {
-    func publishEvent(vo: NewEventInfo) -> ReturnGenericity<String>
+    func publishEvent(vo: NewEvent) -> ReturnGenericity<String>
     
-    func modifyEvent(vo: EventInfo) -> ReturnGenericity<String>
+    func modifyEvent(vo: UpdateEvent) -> ReturnGenericity<String>
     
-    func modifyClause(vo: ClauseInfo) -> ReturnGenericity<String>
+    func modifyClause(vo: UpdateClause) -> ReturnGenericity<String>
     
-    func deleteEvent(vo: EventIDInfo) -> ReturnGenericity<String>
+    func deleteEvent(vo: EventID) -> ReturnGenericity<String>
     
-    func deleteClause(vo: ClauseIDInfo) -> ReturnGenericity<String>
+    func deleteClause(vo: ClauseID) -> ReturnGenericity<String>
     
     func findEvent(vo: EventConditions) -> ReturnGenericity<Any>
 }

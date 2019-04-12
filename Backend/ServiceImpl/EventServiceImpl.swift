@@ -8,7 +8,7 @@
 
 import Foundation
 
-class EventGroupServiceImpl: EventService{
+class EventServiceImpl: EventService{
     let eventDao: EventDao
     
     init(kind: KindOfEvent) {
@@ -19,27 +19,27 @@ class EventGroupServiceImpl: EventService{
         }
     }
     
-    func publishEvent(vo: NewEventInfo) -> ReturnGenericity<String> {
-        return eventDao.createEvent(vo: vo)
+    func publishEvent(vo: NewEvent) -> ReturnGenericity<String> {
+        return eventDao.insertEvent(vo: vo)
     }
     
-    func modifyEvent(vo: EventInfo) -> ReturnGenericity<String> {
-        return eventDao.changeEventInfo(vo: vo)
+    func modifyEvent(vo: UpdateEvent) -> ReturnGenericity<String> {
+        return eventDao.updateEvent(vo: vo)
     }
     
-    func modifyClause(vo: ClauseInfo) -> ReturnGenericity<String> {
-        return eventDao.changeClauseInfo(vo: vo)
+    func modifyClause(vo: UpdateClause) -> ReturnGenericity<String> {
+        return eventDao.updateClause(vo: vo)
     }
 
-    func deleteEvent(vo: EventIDInfo) -> ReturnGenericity<String> {
+    func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
         return eventDao.deleteEvent(vo: vo)
     }
     
-    func deleteClause(vo: ClauseIDInfo) -> ReturnGenericity<String> {
+    func deleteClause(vo: ClauseID) -> ReturnGenericity<String> {
         return eventDao.deleteClause(vo: vo)
     }
     
     func findEvent(vo: EventConditions) -> ReturnGenericity<Any> {
-        return eventDao.findEvent(vo: vo)
+        return eventDao.listEvents(vo: vo)
     }
 }

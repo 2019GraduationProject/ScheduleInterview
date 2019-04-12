@@ -8,15 +8,21 @@
 import Foundation
 
 protocol UserService{
-    func addUser(vo: SignupInfo) -> ReturnGenericity<String>
+    func addUser(vo: NewUser) -> ReturnGenericity<String>
     
-    func checkUser(vo: LoginInfo) -> ReturnGenericity<String>
+    func checkUser(vo: CheckUser) -> ReturnGenericity<String>
     
-    func getUserInfoByID(vo: UserIDInfo) -> ReturnGenericity<UserInfo>
+    func getUserInfoByID(vo: UserID) -> ReturnGenericity<UserInfo>
     
-    func getUserInfoByName(vo: UserNameInfo) -> ReturnGenericity<UserInfo>
+    func getUserInfoByPhone(vo: UserPhone) -> ReturnGenericity<UserInfo>
     
-    func modifyUserInfo(vo: UserInfoChanging) -> ReturnGenericity<String>
+    func modifyUserInfo(vo: UpdateUser) -> ReturnGenericity<String>
     
-    func resetPassword(vo: NewPasswordInfo) -> ReturnGenericity<String>
+    func resetPassword(vo: NewPassword) -> ReturnGenericity<String>
+    
+    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]>
+    
+    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
+    
+    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
 }

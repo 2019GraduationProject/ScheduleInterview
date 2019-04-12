@@ -23,4 +23,10 @@ protocol GroupService{
     func dissolveGroup(vo: GroupID) -> ReturnGenericity<String>
     
     func removeMember(vo: RemoveMember) -> ReturnGenericity<String>
+    
+    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
+    
+    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
+    
+    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]>
 }

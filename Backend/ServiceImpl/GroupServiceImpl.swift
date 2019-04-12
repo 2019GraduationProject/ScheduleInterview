@@ -42,4 +42,17 @@ class GroupServiceImpl: GroupService{
     func removeMember(vo: RemoveMember) -> ReturnGenericity<String> {
         return groupDao.deleteMember(vo: vo)
     }
+    
+    
+    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
+        return groupDao.listCreateGroups(vo: vo)
+    }
+    
+    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
+        return groupDao.listJoinGroups(vo: vo)
+    }
+    
+    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]> {
+        return invitationDao.listInvitations(vo: vo)
+    }
 }

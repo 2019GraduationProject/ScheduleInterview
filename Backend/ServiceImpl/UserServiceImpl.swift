@@ -10,8 +10,6 @@ import Foundation
 class UserServiceImpl: UserService {
     
     let userDao = UserDao()
-    let invitationDao = InvitationDao()
-    let groupDao = GroupDao()
     
     func addUser(vo: NewUser) -> ReturnGenericity<String> {
         return userDao.insertUser(vo: vo)
@@ -37,15 +35,4 @@ class UserServiceImpl: UserService {
         return userDao.updatePassword(vo:vo)
     }
     
-    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]> {
-        return invitationDao.listInvitations(vo: vo)
-    }
-    
-    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
-        return groupDao.listCreateGroups(vo: vo)
-    }
-    
-    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]> {
-        return groupDao.listJoinGroups(vo: vo)
-    }
 }

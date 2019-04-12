@@ -19,10 +19,5 @@ protocol UserService{
     func modifyUserInfo(vo: UpdateUser) -> ReturnGenericity<String>
     
     func resetPassword(vo: NewPassword) -> ReturnGenericity<String>
-    
-    func getInvitations(vo: UserID) -> ReturnGenericity<[InvitationInfo]>
-    
-    func getCreateGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
-    
-    func getJoinGroup(vo: UserID) -> ReturnGenericity<[GroupInfo]>
+
 }

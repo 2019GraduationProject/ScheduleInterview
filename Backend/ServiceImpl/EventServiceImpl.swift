@@ -39,7 +39,19 @@ class EventServiceImpl: EventService{
         return eventDao.deleteClause(vo: vo)
     }
     
-    func findEvent(vo: EventConditions) -> ReturnGenericity<Any> {
+    func getCreateEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        return eventDao.listCreateEvent(vo: vo)
+    }
+    
+    func getJoinEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        return eventDao.listJoinEvent(vo: vo)
+    }
+    
+    func getAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        return eventDao.listAllEvent(vo: vo)
+    }
+    
+    func findEvent(vo: EventConditions) -> ReturnGenericity<[EventInfo]> {
         return eventDao.listEvents(vo: vo)
     }
 }

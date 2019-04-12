@@ -24,7 +24,8 @@ class UserDao{
         let userName: String = "user\(vo.phone)"
     
         let createQuery = mysql!.query(statement: """
-            INSERT INTO `user` (`user_name`, `password`, `phone`) VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)')
+            INSERT INTO `user` (`user_name`, `password`, `phone`, `gender`, `introduction`)
+                VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)',\(vo.gender), '\(vo.introduction)')
             """)
         guard createQuery else {
             return ReturnGenericity<String>(state: false, message: "phone exist", info: mysql!.errorMessage())
@@ -155,7 +156,7 @@ class UserDao{
         }
         
         let changeQuery = mysql!.query(statement: """
-            UPDATE `user` SET `user_name`='\(vo.userName)', `gender`='\(vo.gender)', `introduction`='\(vo.introduction)' WHERE `user_id`='\(vo.userID)'
+            UPDATE `user` SET `user_name`='\(vo.userName)', `gender`=\(vo.gender), `introduction`='\(vo.introduction)' WHERE `user_id`='\(vo.userID)'
             """)
         guard changeQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())

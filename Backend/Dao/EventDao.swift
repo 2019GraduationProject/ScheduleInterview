@@ -19,7 +19,13 @@ protocol EventDao{
     
     func deleteClause(vo: ClauseID) -> ReturnGenericity<String>
     
-    func listEvents(vo: EventConditions) -> ReturnGenericity<Any>
+    func listCreateEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func listJoinEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func listAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func listEvents(vo: EventConditions) -> ReturnGenericity<[EventInfo]>
 }
 
 class EventGroupDaoImpl : EventDao{
@@ -183,12 +189,114 @@ class EventGroupDaoImpl : EventDao{
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     
+    
+    /// get group event create by user
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: events
+    func listCreateEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_group` WHERE `publisher_id` = \(vo.userID)
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.groupID = row[1]!
+            event.publisherID = vo.userID
+            event.eventName = row[3]!
+            event.time = row[4]!
+            event.location = row[5]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
+    /// get group event user joint in
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: events
+    func listJoinEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_group` WHERE `event_id` IN (
+                SELECT `event_id` FROM `order_group` WHERE `user_id` = '\(vo.userID)')
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.groupID = row[1]!
+            event.publisherID = row[2]!
+            event.eventName = row[3]!
+            event.time = row[4]!
+            event.location = row[5]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
+    /// get group event not begin
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: events
+    func listAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_group` WHERE `time`>'\(TimeTool.getCurrentDay())' `group_id` IN (
+                SELECT `group_id` FROM `invitation_accept` WHERE `user_id` = '\(vo.userID)')
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.groupID = row[1]!
+            event.publisherID = row[2]!
+            event.eventName = row[3]!
+            event.time = row[4]!
+            event.location = row[5]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
     /// <#Description#>
     ///
     /// - Parameter vo: <#vo description#>
     /// - Returns: <#return value description#>
-    func listEvents(vo: EventConditions) -> ReturnGenericity<Any> {
-        return ReturnGenericity<Any>(info: "")
+    func listEvents(vo: EventConditions) -> ReturnGenericity<[EventInfo]> {
+        return ReturnGenericity<[EventInfo]>(info: [])
     }
     
 }
@@ -354,11 +462,110 @@ class EventGlobalDaoImpl: EventDao{
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     
+    
+    /// get global event create by user
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: events
+    func listCreateEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_global` WHERE `publisher_id` = \(vo.userID)
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.publisherID = vo.userID
+            event.eventName = row[2]!
+            event.time = row[3]!
+            event.location = row[4]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
+    /// get events user joint in
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: events
+    func listJoinEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_global` WHERE `event_id` IN (
+            SELECT `event_id` FROM `order_global` WHERE `user_id` = '\(vo.userID)')
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.publisherID = row[1]!
+            event.eventName = row[2]!
+            event.time = row[3]!
+            event.location = row[4]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
+    /// get global event not begin
+    ///
+    /// - Parameter vo: user id (not used)
+    /// - Returns: events
+    func listAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_global` WHERE `time`>'\(TimeTool.getCurrentDay())'
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[EventInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var event: EventInfo = EventInfo(groupID: "")
+        var events: [EventInfo] = []
+        res.forEachRow(callback: {row in
+            event.eventID = row[0]!
+            event.groupID = row[1]!
+            event.publisherID = row[2]!
+            event.eventName = row[3]!
+            event.time = row[4]!
+            event.location = row[5]!
+            events.append(event)
+        })
+        
+        return ReturnGenericity<[EventInfo]>(state: true, message: "", info: events)
+    }
+    
     /// <#Description#>
     ///
     /// - Parameter vo: <#vo description#>
     /// - Returns: <#return value description#>
-    func listEvents(vo: EventConditions) -> ReturnGenericity<Any> {
-        return ReturnGenericity<Any>(info: "")
+    func listEvents(vo: EventConditions) -> ReturnGenericity<[EventInfo]> {
+        return ReturnGenericity<[EventInfo]>(info: [])
     }
 }

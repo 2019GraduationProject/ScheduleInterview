@@ -18,5 +18,11 @@ protocol EventService {
     
     func deleteClause(vo: ClauseID) -> ReturnGenericity<String>
     
-    func findEvent(vo: EventConditions) -> ReturnGenericity<Any>
+    func getCreateEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func getJoinEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func getAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]>
+    
+    func findEvent(vo: EventConditions) -> ReturnGenericity<[EventInfo]>
 }

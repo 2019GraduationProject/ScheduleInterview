@@ -13,10 +13,10 @@ struct Event{
     var groupID: String?
     var publisherID: String
     var eventName: String
-    var time: Date
+    var time: String
     var location: String
     
-    init(eventID:String, groupID: String?, publisherID:String, eventName: String, time:Date , location: String) {
+    init(eventID:String, groupID: String?, publisherID:String, eventName: String, time: String , location: String) {
         self.eventID = eventID
         self.groupID = groupID
         self.publisherID = publisherID
@@ -30,11 +30,11 @@ struct NewEvent{
     var publisherID: String
     var groupID: String?
     var eventName: String
-    var time: Date
+    var time: String
     var location: String
     var clauses: [newClause]
     
-    init(publisherID: String, groupID: String?, eventName: String, time: Date , location: String, clauses: [newClause]) {
+    init(publisherID: String, groupID: String?, eventName: String, time: String , location: String, clauses: [newClause]) {
         self.publisherID = publisherID
         self.groupID = groupID
         self.eventName = eventName
@@ -48,12 +48,30 @@ struct UpdateEvent{
     var eventID: String
     var groupID: String?
     var eventName: String
-    var time: Date
+    var time: String
     var location: String
     
-    init(eventID:String, groupID: String?, eventName: String, time:Date , location: String) {
+    init(eventID:String, groupID: String?, eventName: String, time: String, location: String) {
         self.eventID = eventID
         self.groupID = groupID
+        self.eventName = eventName
+        self.time = time
+        self.location = location
+    }
+}
+
+struct EventInfo{
+    var eventID: String
+    var groupID: String?
+    var publisherID: String
+    var eventName: String
+    var time: String
+    var location: String
+    
+    init(eventID:String = "", groupID: String?, publisherID:String = "", eventName: String = "", time:String = "", location: String = "") {
+        self.eventID = eventID
+        self.groupID = groupID
+        self.publisherID = publisherID
         self.eventName = eventName
         self.time = time
         self.location = location

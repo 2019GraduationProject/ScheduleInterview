@@ -55,6 +55,13 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
+        let insertQuery = mysql!.query(statement: """
+            INSERT INTO `group_\(groupID)` (`user_id`, `auth_level`) VALUES (\(vo.creatorID), '\(AuthLevel.CREATOR.getValue())')
+            """)
+        guard insertQuery else {
+            return ReturnGenericity<String>(state: false, message: "group exist", info: mysql!.errorMessage())
+        }
+        
         return ReturnGenericity<String>(state: true, message: "success", info: groupID)
     }
     
@@ -101,8 +108,8 @@ class GroupDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT g.`group_id`,g.`creator_id`, g.`group_name` FROM `invitation_accept` ia, `group` g
-                WHERE ia.`group_id`=g.`group_id` AND ia.`user_id` = \(vo.userID)
+            SELECT * FROM `group` WHERE `group_id` IN(
+                SELECT `group_id` FROM `invitation_accept` WHERE `user_id` = '\(vo.userID)')
             """)
         guard getQuery else {
             return ReturnGenericity<[GroupInfo]>(state: false, message: "database wrong", info: [])
@@ -134,7 +141,7 @@ class GroupDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT * FROM `group_`\(vo.groupID)
+            SELECT * FROM `group_\(vo.groupID)`
             """)
         guard getQuery else {
             return ReturnGenericity<[MemberInfo]>(state: false, message: "database wrong", info: [])

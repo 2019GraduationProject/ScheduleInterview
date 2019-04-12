@@ -35,9 +35,11 @@ struct MemberInfo {
 struct RemoveMember {
     var groupID: String
     var memberID: String
+    var userID: String
     
-    init(groupID: String, memberID: String) {
+    init(groupID: String, memberID: String, userID: String) {
         self.groupID = groupID
         self.memberID = memberID
+        self.userID = userID
     }
 }

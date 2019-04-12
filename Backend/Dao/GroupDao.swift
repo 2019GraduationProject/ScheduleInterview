@@ -179,7 +179,7 @@ class GroupDao{
 //        guard changeQuery else{
 //            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
 //        }
-        
+    
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     
@@ -195,14 +195,43 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let deleteQuery = mysql!.query(statement: """
+        let deleteGroupQuery = mysql!.query(statement: """
             DELETE FROM `group` WHERE `group_id` = '\(vo.groupID)';
             """)
-        guard deleteQuery else{
+        let dropGroupQuery = mysql!.query(statement: """
+            DROP TABLE `group_\(vo.groupID)`
+            """)
+        guard deleteGroupQuery&&dropGroupQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
-        //TODO : 删除组信息相关
+        let deleteInvitationQuery = mysql!.query(statement: """
+            DELETE FROM `invitation` WHERE `group_id` = '\(vo.groupID)';
+            """)
+        let deleteAcceptInvitationQuery = mysql!.query(statement: """
+            DELETE FROM `invitation_accept` WHERE `group_id` = '\(vo.groupID)';
+            """)
+        let deleteRefuseInvitationQuery = mysql!.query(statement: """
+            DELETE FROM `invitation_refuse` WHERE `group_id` = '\(vo.groupID)';
+            """)
+        guard deleteInvitationQuery && deleteAcceptInvitationQuery && deleteRefuseInvitationQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        let deleteEventQuery = mysql!.query(statement: """
+            DELETE FROM `event_group` WHERE `group_id` = '\(vo.groupID)';
+            """)
+        //DROP Event tables
+        guard deleteEventQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        let deleteOrderQuery = mysql!.query(statement: """
+            DELETE FROM `order_group` WHERE `group_id` = '\(vo.groupID)';
+            """)
+        guard deleteOrderQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
@@ -224,7 +253,21 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
-        //TODO: 删除成员信息相关
+        let deleteAcceptInvitationQuery = mysql!.query(statement: """
+            DELETE FROM `invitation_accept` WHERE `group_id` = '\(vo.groupID)' AND `user_id` = '\(vo.userID)'
+            """)
+        guard deleteAcceptInvitationQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        //删除该用户发布的事件
+        
+        let deleteOrderQuery = mysql!.query(statement: """
+            DELETE FROM `order_group` WHERE `group_id` = '\(vo.groupID)' AND `user_id` = '\(vo.userID)'
+            """)
+        guard deleteOrderQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }

@@ -25,11 +25,13 @@ struct Invitation {
 struct InvitationInfo {
     var invitationID: String
     var groupID: String
+    var groupName: String
     var inviterID: String
     
-    init(invitationID:String = "", groupID: String = "", inviterID: String = "") {
+    init(invitationID:String = "", groupID: String = "", groupName :String = "", inviterID: String = "") {
         self.invitationID = invitationID
         self.groupID = groupID
+        self.groupName = groupName
         self.inviterID = inviterID
     }
 }

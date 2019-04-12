@@ -108,7 +108,8 @@ class InvitationDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT * FROM `invitation` WHERE `invitee_id` = \(vo.userID)
+            SELECT i.`invitation_id`, i.`group_id`, i.`inviter_id`, g.`group_name` FROM `invitation` i, `group` g
+            WHERE i.`invitee_id` = \(vo.userID) AND i.`group_id` = g.`group_id`
             """)
         guard getQuery else{
             return ReturnGenericity<[InvitationInfo]>(state: false, message: "Wrong", info: [])
@@ -121,6 +122,7 @@ class InvitationDao{
             invitation.invitationID = row[0]!
             invitation.groupID = row[1]!
             invitation.inviterID = row[2]!
+            invitation.groupName = row[3]!
             invitations.append(invitation)
         })
         return ReturnGenericity<[InvitationInfo]>(state: true, message: "success", info: invitations)

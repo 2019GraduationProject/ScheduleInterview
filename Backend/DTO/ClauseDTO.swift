@@ -32,7 +32,7 @@ struct Clause {
     }
 }
 
-struct newClause {
+struct NewClause {
     var clauseName: String
     var startTime: String
     var endTime: String
@@ -72,6 +72,29 @@ struct UpdateClause {
     }
 }
 
+struct ClauseInfo {
+    var clauseID: String
+    var clauseName: String
+    var startTime: String
+    var endTime: String
+    var clauseAuthLevel: AuthLevel
+    var introduction: String
+    /// 人数限制
+    var limit: Int
+    /// 当前总人数
+    var total: Int
+    
+    init(clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int, total: Int) {
+        self.clauseID = clauseID
+        self.clauseName = clauseName
+        self.startTime = startTime
+        self.endTime = endTime
+        self.clauseAuthLevel = clauseAuthLevel
+        self.introduction = introduction
+        self.limit = limit
+        self.total = total
+    }
+}
 
 struct ClauseID {
     var eventID: String

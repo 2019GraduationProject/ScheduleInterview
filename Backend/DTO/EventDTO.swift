@@ -32,9 +32,9 @@ struct NewEvent{
     var eventName: String
     var time: String
     var location: String
-    var clauses: [newClause]
+    var clauses: [NewClause]
     
-    init(publisherID: String, groupID: String?, eventName: String, time: String , location: String, clauses: [newClause]) {
+    init(publisherID: String, groupID: String?, eventName: String, time: String , location: String, clauses: [NewClause]) {
         self.publisherID = publisherID
         self.groupID = groupID
         self.eventName = eventName

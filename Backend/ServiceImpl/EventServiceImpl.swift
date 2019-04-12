@@ -30,6 +30,10 @@ class EventServiceImpl: EventService{
     func modifyClause(vo: UpdateClause) -> ReturnGenericity<String> {
         return eventDao.updateClause(vo: vo)
     }
+    
+    func addClause(vo: NewClause) -> ReturnGenericity<String> {
+        return eventDao.insertClause(vo: vo)
+    }
 
     func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
         return eventDao.deleteEvent(vo: vo)
@@ -49,6 +53,10 @@ class EventServiceImpl: EventService{
     
     func getAllEvent(vo: UserID) -> ReturnGenericity<[EventInfo]> {
         return eventDao.listAllEvent(vo: vo)
+    }
+    
+    func getClauses(vo: EventID) -> ReturnGenericity<[ClauseInfo]> {
+        return eventDao.listClause(vo: vo)
     }
     
     func findEvent(vo: EventConditions) -> ReturnGenericity<[EventInfo]> {

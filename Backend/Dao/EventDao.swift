@@ -84,7 +84,7 @@ class EventGroupDaoImpl : EventDao{
         for clause in vo.clauses {
             initQuery = mysql!.query(statement: """
                 INSERT INTO `event_group_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel)', '\(clause.introduction)', '\(clause.limit)');
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel.getValue())', '\(clause.introduction)', '\(clause.limit)');
                 """)
             if !initQuery{
                 break
@@ -357,7 +357,7 @@ class EventGlobalDaoImpl: EventDao{
         for clause in vo.clauses {
             initQuery = mysql!.query(statement: """
                 INSERT INTO `event_global_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel)', '\(clause.introduction)', '\(clause.limit)');
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel.getValue())', '\(clause.introduction)', '\(clause.limit)');
                 """)
             if !initQuery{
                 break
@@ -550,11 +550,10 @@ class EventGlobalDaoImpl: EventDao{
         var events: [EventInfo] = []
         res.forEachRow(callback: {row in
             event.eventID = row[0]!
-            event.groupID = row[1]!
-            event.publisherID = row[2]!
-            event.eventName = row[3]!
-            event.time = row[4]!
-            event.location = row[5]!
+            event.publisherID = row[1]!
+            event.eventName = row[2]!
+            event.time = row[3]!
+            event.location = row[4]!
             events.append(event)
         })
         

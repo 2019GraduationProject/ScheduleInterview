@@ -11,15 +11,15 @@ import Foundation
 struct Clause {
     var clauseID: String
     var clauseName: String
-    var startTime: Date
-    var endTime: Date
+    var startTime: String
+    var endTime: String
     var clauseAuthLevel: AuthLevel
     var introduction: String
     var limit: Int
     var total: Int
     var members: String
     
-    init(clauseID:String, clauseName: String, startTime: Date, endTime: Date, clauseAuthLevel: AuthLevel, introduction: String, limit: Int, total: Int, members: String) {
+    init(clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int, total: Int, members: String) {
         self.clauseID = clauseID
         self.clauseName = clauseName
         self.startTime = startTime
@@ -34,13 +34,13 @@ struct Clause {
 
 struct newClause {
     var clauseName: String
-    var startTime: Date
-    var endTime: Date
+    var startTime: String
+    var endTime: String
     var clauseAuthLevel: AuthLevel
     var introduction: String
     var limit: Int
     
-    init(clauseName: String, startTime: Date, endTime: Date, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
+    init(clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
         self.clauseName = clauseName
         self.startTime = startTime
         self.endTime = endTime
@@ -54,13 +54,13 @@ struct UpdateClause {
     var eventID: String
     var clauseID: String
     var clauseName: String
-    var startTime: Date
-    var endTime: Date
+    var startTime: String
+    var endTime: String
     var clauseAuthLevel: AuthLevel
     var introduction: String
     var limit: Int
     
-    init(eventID: String,clauseID:String, clauseName: String, startTime: Date, endTime: Date, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
+    init(eventID: String,clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
         self.eventID = eventID
         self.clauseID = clauseID
         self.clauseName = clauseName

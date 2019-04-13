@@ -7,11 +7,20 @@
 
 import Foundation
 
-enum AuthLevel: Int {
+enum GroupAuthLevel: Int {
     case CREATOR = 5
     case MANAGER = 4
     case VIPMEMBER = 2
     case MEMBER = 1
+    
+    func getValue() -> Int {
+        return self.rawValue
+    }
+}
+
+enum GlobalAuthLevel: Int {
+    case ALL = 1
+    //TODO
     
     func getValue() -> Int {
         return self.rawValue

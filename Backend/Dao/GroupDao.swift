@@ -56,7 +56,7 @@ class GroupDao{
         }
         
         let insertQuery = mysql!.query(statement: """
-            INSERT INTO `group_\(groupID)` (`user_id`, `auth_level`) VALUES (\(vo.creatorID), '\(AuthLevel.CREATOR.getValue())')
+            INSERT INTO `group_\(groupID)` (`user_id`, `auth_level`) VALUES (\(vo.creatorID), '\(GroupAuthLevel.CREATOR.getValue())')
             """)
         guard insertQuery else {
             return ReturnGenericity<String>(state: false, message: "group exist", info: mysql!.errorMessage())
@@ -154,7 +154,7 @@ class GroupDao{
         res!.forEachRow(callback: { row in
             member.memberID = row[0]!
             member.userID = row[1]!
-            member.authLevel = row[2]!
+            member.authLevel = GroupAuthLevel(rawValue: Int(row[2]!)!)!
             members.append(member)
         })
         

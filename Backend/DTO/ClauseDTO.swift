@@ -13,18 +13,20 @@ struct Clause {
     var clauseName: String
     var startTime: String
     var endTime: String
-    var clauseAuthLevel: AuthLevel
+    var groupAuthLevel: GroupAuthLevel?
+    var globalAuthLevel: GlobalAuthLevel?
     var introduction: String
     var limit: Int
     var total: Int
     var members: String
     
-    init(clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int, total: Int, members: String) {
+    init(clauseID:String, clauseName: String, startTime: String, endTime: String, groupAuthLevel: GroupAuthLevel?, globalAuthLevel: GlobalAuthLevel?,introduction: String, limit: Int, total: Int, members: String) {
         self.clauseID = clauseID
         self.clauseName = clauseName
         self.startTime = startTime
         self.endTime = endTime
-        self.clauseAuthLevel = clauseAuthLevel
+        self.groupAuthLevel = groupAuthLevel
+        self.globalAuthLevel = globalAuthLevel
         self.introduction = introduction
         self.limit = limit
         self.total = total
@@ -33,18 +35,22 @@ struct Clause {
 }
 
 struct NewClause {
+    var eventID: String
     var clauseName: String
     var startTime: String
     var endTime: String
-    var clauseAuthLevel: AuthLevel
+    var groupAuthLevel: GroupAuthLevel?
+    var globalAuthLevel: GlobalAuthLevel?
     var introduction: String
     var limit: Int
     
-    init(clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
+    init(eventID:String,clauseName: String, startTime: String, endTime: String, groupAuthLevel: GroupAuthLevel?, globalAuthLevel: GlobalAuthLevel?, introduction: String, limit: Int) {
+        self.eventID = eventID
         self.clauseName = clauseName
         self.startTime = startTime
         self.endTime = endTime
-        self.clauseAuthLevel = clauseAuthLevel
+        self.groupAuthLevel = groupAuthLevel
+        self.globalAuthLevel = globalAuthLevel
         self.introduction = introduction
         self.limit = limit
     }
@@ -56,17 +62,19 @@ struct UpdateClause {
     var clauseName: String
     var startTime: String
     var endTime: String
-    var clauseAuthLevel: AuthLevel
+    var groupAuthLevel: GroupAuthLevel?
+    var globalAuthLevel: GlobalAuthLevel?
     var introduction: String
     var limit: Int
     
-    init(eventID: String,clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int) {
+    init(eventID: String,clauseID:String, clauseName: String, startTime: String, endTime: String, groupAuthLevel: GroupAuthLevel?, globalAuthLevel: GlobalAuthLevel?, introduction: String, limit: Int) {
         self.eventID = eventID
         self.clauseID = clauseID
         self.clauseName = clauseName
         self.startTime = startTime
         self.endTime = endTime
-        self.clauseAuthLevel = clauseAuthLevel
+        self.groupAuthLevel = groupAuthLevel
+        self.globalAuthLevel = globalAuthLevel
         self.introduction = introduction
         self.limit = limit
     }
@@ -77,19 +85,21 @@ struct ClauseInfo {
     var clauseName: String
     var startTime: String
     var endTime: String
-    var clauseAuthLevel: AuthLevel
+    var groupAuthLevel: GroupAuthLevel?
+    var globalAuthLevel: GlobalAuthLevel?
     var introduction: String
     /// 人数限制
     var limit: Int
     /// 当前总人数
     var total: Int
     
-    init(clauseID:String, clauseName: String, startTime: String, endTime: String, clauseAuthLevel: AuthLevel, introduction: String, limit: Int, total: Int) {
+    init(clauseID:String = "", clauseName: String = "", startTime: String = "", endTime: String = "", groupAuthLevel: GroupAuthLevel? = GroupAuthLevel.MEMBER, globalAuthLevel: GlobalAuthLevel? = GlobalAuthLevel.ALL, introduction: String = "", limit: Int = 0, total: Int = 0) {
         self.clauseID = clauseID
         self.clauseName = clauseName
         self.startTime = startTime
         self.endTime = endTime
-        self.clauseAuthLevel = clauseAuthLevel
+        self.groupAuthLevel = groupAuthLevel
+        self.globalAuthLevel = globalAuthLevel
         self.introduction = introduction
         self.limit = limit
         self.total = total

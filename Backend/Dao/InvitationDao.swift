@@ -53,7 +53,7 @@ class InvitationDao{
         }
         
         let addUserQuery = mysql!.query(statement: """
-            INSERT INTO `group_\(vo.groupID)`(`user_id`, `auth_level`) VALUES ('\(vo.userID)', '\(AuthLevel.MEMBER.getValue())')
+            INSERT INTO `group_\(vo.groupID)`(`user_id`, `auth_level`) VALUES ('\(vo.userID)', '\(GroupAuthLevel.MEMBER.getValue())')
             """)
         guard addUserQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())

@@ -11,9 +11,9 @@ import Foundation
 struct Member {
     var memberID: String
     var userID: String
-    var authLevel: String
+    var authLevel: GroupAuthLevel
     
-    init(memberID: String, userID: String, authLevel: String) {
+    init(memberID: String, userID: String, authLevel: GroupAuthLevel) {
         self.memberID = memberID
         self.userID = userID
         self.authLevel = authLevel
@@ -23,9 +23,9 @@ struct Member {
 struct MemberInfo {
     var memberID: String
     var userID: String
-    var authLevel: String
+    var authLevel: GroupAuthLevel
     
-    init(memberID: String = "", userID: String = "", authLevel: String = "") {
+    init(memberID: String = "", userID: String = "", authLevel: GroupAuthLevel = GroupAuthLevel.MEMBER) {
         self.memberID = memberID
         self.userID = userID
         self.authLevel = authLevel

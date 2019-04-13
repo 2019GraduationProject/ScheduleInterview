@@ -64,7 +64,7 @@ class EventGroupDaoImpl : EventDao{
         for clause in vo.clauses {
             initQuery = mysql!.query(statement: """
                 INSERT INTO `event_group_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.clauseAuthLevel.getValue())', '\(clause.introduction)', '\(clause.limit)');
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.groupAuthLevel!.getValue())', '\(clause.introduction)', '\(clause.limit)');
                 """)
             if !initQuery{
                 break
@@ -123,12 +123,25 @@ class EventGroupDaoImpl : EventDao{
     }
     
     
-    /// <#Description#>
+    /// add clause
     ///
-    /// - Parameter vo: <#vo description#>
-    /// - Returns: <#return value description#>
+    /// - Parameter vo: clause info
+    /// - Returns: success/fail
     func insertClause(vo: NewClause) -> ReturnGenericity<String> {
-        return ReturnGenericity<String>(info: "")
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+        }
+        
+        let insertQuery = mysql!.query(statement: """
+            INSERT INTO `event_group_\(vo.eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
+            VALUES ('\(vo.clauseName)', '\(vo.startTime)', '\(vo.endTime)', '\(vo.groupAuthLevel!.getValue())', '\(vo.introduction)', '\(vo.limit)');
+            """)
+        guard insertQuery else {
+            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     
     /// delete group event
@@ -281,12 +294,36 @@ class EventGroupDaoImpl : EventDao{
     }
     
     
-    /// <#Description#>
+    /// get group clauses
     ///
-    /// - Parameter vo: <#vo description#>
-    /// - Returns: <#return value description#>
+    /// - Parameter vo: event id
+    /// - Returns: clauses
     func listClause(vo: EventID) -> ReturnGenericity<[ClauseInfo]> {
-        return ReturnGenericity<[ClauseInfo]>(info: [])
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<[ClauseInfo]>(state: false, message: "connect database failed", info: [])
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `event_group_\(vo.eventID)`
+            """)
+        guard getQuery else{
+            return ReturnGenericity<[ClauseInfo]>(state: false, message: "Wrong", info: [])
+        }
+        
+        let res = mysql!.storeResults()!
+        var clause: ClauseInfo = ClauseInfo()
+        var clauses: [ClauseInfo] = []
+        res.forEachRow(callback: {row in
+            clause.clauseID = row[0]!
+            clause.clauseName = row[1]!
+            clause.startTime = row[2]!
+            clause.endTime = row[3]!
+            clause.groupAuthLevel = GroupAuthLevel(rawValue: Int(row[4]!)!)
+            clauses.append(clause)
+        })
+        
+        return ReturnGenericity<[ClauseInfo]>(state: true, message: "", info: clauses)
     }
     
     /// <#Description#>

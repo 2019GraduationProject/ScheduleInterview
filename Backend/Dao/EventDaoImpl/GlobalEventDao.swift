@@ -42,7 +42,7 @@ class EventGlobalDaoImpl: EventDao{
             eventID = row.first!!
         }
         
-        let createInGroupEventQuery = mysql!.query(statement: """
+        let createGlobalEventQuery = mysql!.query(statement: """
             CREATE TABLE `event_global_\(eventID)` (
             `clause_id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
             `clause_name` varchar(256) NOT NULL DEFAULT '',
@@ -56,7 +56,7 @@ class EventGlobalDaoImpl: EventDao{
             PRIMARY KEY (`clause_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
             """)
-        guard createInGroupEventQuery else {
+        guard createGlobalEventQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
         }
         
@@ -64,7 +64,7 @@ class EventGlobalDaoImpl: EventDao{
         for clause in vo.clauses {
             initQuery = mysql!.query(statement: """
                 INSERT INTO `event_global_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.groupAuthLevel!.getValue())', '\(clause.introduction)', '\(clause.limit)');
+                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.globalAuthLevel!.getValue())', '\(clause.introduction)', '\(clause.limit)');
                 """)
             if !initQuery{
                 break
@@ -209,7 +209,7 @@ class EventGlobalDaoImpl: EventDao{
         }
         
         let res = mysql!.storeResults()!
-        var event: EventInfo = EventInfo(groupID: "")
+        var event: EventInfo = EventInfo(groupID: nil)
         var events: [EventInfo] = []
         res.forEachRow(callback: {row in
             event.eventID = row[0]!
@@ -242,7 +242,7 @@ class EventGlobalDaoImpl: EventDao{
         }
         
         let res = mysql!.storeResults()!
-        var event: EventInfo = EventInfo(groupID: "")
+        var event: EventInfo = EventInfo(groupID: nil)
         var events: [EventInfo] = []
         res.forEachRow(callback: {row in
             event.eventID = row[0]!
@@ -274,7 +274,7 @@ class EventGlobalDaoImpl: EventDao{
         }
         
         let res = mysql!.storeResults()!
-        var event: EventInfo = EventInfo(groupID: "")
+        var event: EventInfo = EventInfo(groupID: nil)
         var events: [EventInfo] = []
         res.forEachRow(callback: {row in
             event.eventID = row[0]!
@@ -314,6 +314,8 @@ class EventGlobalDaoImpl: EventDao{
             clause.startTime = row[2]!
             clause.endTime = row[3]!
             clause.globalAuthLevel = GlobalAuthLevel(rawValue: Int(row[4]!)!)
+            clause.limit = Int(row[5]!)!
+            clause.total = Int(row[6]!)!
             clauses.append(clause)
         })
         

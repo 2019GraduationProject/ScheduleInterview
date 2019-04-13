@@ -320,6 +320,8 @@ class EventGroupDaoImpl : EventDao{
             clause.startTime = row[2]!
             clause.endTime = row[3]!
             clause.groupAuthLevel = GroupAuthLevel(rawValue: Int(row[4]!)!)
+            clause.limit = Int(row[5]!)!
+            clause.total = Int(row[6]!)!
             clauses.append(clause)
         })
         

@@ -55,6 +55,7 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
+        //add creator
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `group_\(groupID)` (`user_id`, `auth_level`) VALUES (\(vo.creatorID), '\(GroupAuthLevel.CREATOR.getValue())')
             """)
@@ -64,7 +65,7 @@ class GroupDao{
         
         return ReturnGenericity<String>(state: true, message: "success", info: groupID)
     }
-    
+
     
     /// get group create by user
     ///
@@ -162,6 +163,36 @@ class GroupDao{
     }
     
     
+    /// get group info by group id
+    ///
+    /// - Parameter vo: group id
+    /// - Returns: success:group info/fail
+    func getGroupInfo(vo: GroupID) -> ReturnGenericity<GroupInfo> {
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<GroupInfo>(state: false, message: "connect database failed", info: GroupInfo())
+        }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT * FROM `group` WHERE `group_id`='\(vo.groupID)'
+            """)
+        guard getQuery else {
+            return ReturnGenericity<GroupInfo>(state: false, message: "database wrong", info: GroupInfo())
+        }
+        
+        let res = mysql!.storeResults()
+        
+        var group: GroupInfo = GroupInfo()
+        res?.forEachRow(callback: { row in
+            group.groupID = row[0]!
+            group.creatorID = row[1]!
+            group.groupName = row[2]!
+        })
+        
+        return ReturnGenericity<GroupInfo>(state: true, message: "", info: group)
+    }
+    
+    
     /// change group info
     ///
     /// - Parameter vo: group info
@@ -172,13 +203,12 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        // Group Name cannot be changed!
-//        let changeQuery = mysql!.query(statement: """
-//            UPDATE `group` SET `group_name`='\(vo.groupName)' WHERE `group_id`='\(vo.groupID)'
-//            """)
-//        guard changeQuery else{
-//            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-//        }
+        let updateQuery = mysql!.query(statement: """
+            UPDATE `group` SET `group_name`='\(vo.groupName)' WHERE `group_id`='\(vo.groupID)'
+            """)
+        guard updateQuery else{
+            return ReturnGenericity<String>(state: false, message: "group name exist", info: mysql!.errorMessage())
+        }
     
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
@@ -195,41 +225,33 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let deleteGroupQuery = mysql!.query(statement: """
-            DELETE FROM `group` WHERE `group_id` = '\(vo.groupID)';
+        let getQuery = mysql!.query(statement: """
+            SELECT `event_id` FROM `event_group` WHERE `group_id` = '\(vo.groupID)'
             """)
-        let dropGroupQuery = mysql!.query(statement: """
-            DROP TABLE `group_\(vo.groupID)`
-            """)
-        guard deleteGroupQuery&&dropGroupQuery else{
+        guard getQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
-        let deleteInvitationQuery = mysql!.query(statement: """
-            DELETE FROM `invitation` WHERE `group_id` = '\(vo.groupID)';
-            """)
-        let deleteAcceptInvitationQuery = mysql!.query(statement: """
-            DELETE FROM `invitation_accept` WHERE `group_id` = '\(vo.groupID)';
-            """)
-        let deleteRefuseInvitationQuery = mysql!.query(statement: """
-            DELETE FROM `invitation_refuse` WHERE `group_id` = '\(vo.groupID)';
-            """)
-        guard deleteInvitationQuery && deleteAcceptInvitationQuery && deleteRefuseInvitationQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
+        let res = mysql!.storeResults()
         
-        let deleteEventQuery = mysql!.query(statement: """
-            DELETE FROM `event_group` WHERE `group_id` = '\(vo.groupID)';
-            """)
-        //DROP Event tables
-        guard deleteEventQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
+        var dropString: String = ""
+        res!.forEachRow(callback: { row in
+            dropString += ", `event_group_\(row.first!!)`"
+        })
         
-        let deleteOrderQuery = mysql!.query(statement: """
-            DELETE FROM `order_group` WHERE `group_id` = '\(vo.groupID)';
+        let deleteQuery = mysql!.query(statement: """
+            DELETE `group`,`invitation`,`invitation_accept`,`invitation_refuse`,`event_group`,`order_group` FROM `group`
+            LEFT JOIN `invitation` ON `group`.`group_id` = `invitation`.`group_id`
+            LEFT JOIN `invitation_accept` ON `group`.`group_id` = `invitation_accept`.`group_id`
+            LEFT JOIN `invitation_refuse` ON `group`.`group_id` = `invitation_refuse`.`group_id`
+            LEFT JOIN `event_group` ON `group`.`group_id` = `event_group`.`group_id`
+            LEFT JOIN `order_group` ON `group`.`group_id` = `order_group`.`group_id`
+            WHERE `group`.`group_id` = '\(vo.groupID)';
             """)
-        guard deleteOrderQuery else{
+        let dropQuery = mysql!.query(statement: """
+            DROP TABLE `group_\(vo.groupID)` \(dropString)
+            """)
+        guard deleteQuery&&dropQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
@@ -246,26 +268,33 @@ class GroupDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
+        
+        let getQuery = mysql!.query(statement: """
+            SELECT `event_id` FROM `event_group` WHERE `publisher_id` = '\(vo.userID)'
+            """)
+        guard getQuery else{
+            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        let res = mysql!.storeResults()
+        //成员发布的组内事件
+        var events: [String] = []
+        res!.forEachRow(callback: { row in
+            events.append(row.first!!)
+        })
+        let eventDao: EventDao = EventGroupDaoImpl()
+        
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `group_\(vo.groupID)` WHERE `member_id` = '\(vo.memberID)';
+            DELETE `group_\(vo.groupID)`, `invitation_accept`, `order_group` FROM `group_\(vo.groupID)`
+            LEFT JOIN `invitation_accept` ON `group_\(vo.groupID)`.`user_id`=`invitation_accept`.`user_id`
+            LEFT JOIN `order_group` ON `group_\(vo.groupID)`.`user_id`=`order_group`.`user_id`
+            WHERE `user_id` = '\(vo.userID)';
             """)
-        guard deleteQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        var dropQuery = true
+        for eventID in events {
+            dropQuery = dropQuery && eventDao.deleteEvent(vo: EventID(eventID: eventID)).state
         }
-        
-        let deleteAcceptInvitationQuery = mysql!.query(statement: """
-            DELETE FROM `invitation_accept` WHERE `group_id` = '\(vo.groupID)' AND `user_id` = '\(vo.userID)'
-            """)
-        guard deleteAcceptInvitationQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
-        
-        //删除该用户发布的事件
-        
-        let deleteOrderQuery = mysql!.query(statement: """
-            DELETE FROM `order_group` WHERE `group_id` = '\(vo.groupID)' AND `user_id` = '\(vo.userID)'
-            """)
-        guard deleteOrderQuery else{
+        guard deleteQuery&&dropQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         

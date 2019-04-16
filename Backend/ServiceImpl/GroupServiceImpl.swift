@@ -31,6 +31,10 @@ class GroupServiceImpl: GroupService{
         return groupDao.listMembers(vo: vo)
     }
     
+    func getGroupInfo(vo: GroupID) -> ReturnGenericity<GroupInfo> {
+        return groupDao.getGroupInfo(vo: vo)
+    }
+    
     func modifyGroupInfo(vo: UpdateGroup) -> ReturnGenericity<String> {
         return groupDao.updateGroup(vo: vo)
     }

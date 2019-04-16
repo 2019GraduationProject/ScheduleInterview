@@ -15,6 +15,10 @@ class UserServiceImpl: UserService {
         return userDao.insertUser(vo: vo)
     }
     
+    func getUserIDByPhone(vo: UserPhone) -> ReturnGenericity<String> {
+        return userDao.getUserIDByPhone(vo: vo)
+    }
+    
     func checkUser(vo: CheckUser) -> ReturnGenericity<String> {
         return userDao.getPassword(vo: vo)
     }

@@ -25,4 +25,12 @@ class OrderServiceImpl: OrderService{
     func cancelGlobalClause(vo: GlobalOrderID) -> ReturnGenericity<String> {
         return orderDao.deleteGlobalOrder(vo:vo)
     }
+    
+    func getGroupOrders(vo: UserID) -> ReturnGenericity<[GroupOrderInfo]> {
+        return orderDao.listGroupOrder(vo: vo)
+    }
+    
+    func getGlobalOrders(vo: UserID) -> ReturnGenericity<[GlobalOrderInfo]> {
+        return orderDao.listGlobalOrder(vo: vo)
+    }
 }

@@ -39,6 +39,32 @@ struct GlobalOrder {
     }
 }
 
+struct GroupOrderInfo {
+    var orderID:String
+    var groupID: String
+    var eventID:String
+    var clauseID:String
+    
+    init(orderID:String = "", groupID: String = "", eventID: String = "", clauseID:String = "") {
+        self.orderID = orderID
+        self.groupID = groupID
+        self.eventID = eventID
+        self.clauseID = clauseID
+    }
+}
+
+struct GlobalOrderInfo {
+    var orderID: String
+    var eventID:String
+    var clauseID:String
+    
+    init(orderID:String = "",eventID: String = "", clauseID:String = "") {
+        self.orderID = orderID
+        self.eventID = eventID
+        self.clauseID = clauseID
+    }
+}
+
 struct NewGroupOrder {
     var userID: String
     var groupID: String

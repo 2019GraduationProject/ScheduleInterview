@@ -23,12 +23,26 @@ class UserDao{
         
         let userName: String = "user\(vo.phone)"
     
-        let createQuery = mysql!.query(statement: """
+        let insertQuery = mysql!.query(statement: """
             INSERT INTO `user` (`user_name`, `password`, `phone`, `gender`, `introduction`)
                 VALUES ('\(userName)', '\(vo.password)', '\(vo.phone)',\(vo.gender), '\(vo.introduction)')
             """)
-        guard createQuery else {
+        guard insertQuery else {
             return ReturnGenericity<String>(state: false, message: "phone exist", info: mysql!.errorMessage())
+        }
+        
+        return ReturnGenericity<String>(state: true, message: "success", info: "")
+    }
+    
+    
+    /// user id by phone
+    ///
+    /// - Parameter vo: user id
+    /// - Returns: success: user id/fail
+    func getUserIDByPhone(vo: UserPhone) -> ReturnGenericity<String>{
+        let mysql: MySQL? = connector.connected()
+        if mysql == nil{
+            return ReturnGenericity<String>(state: false, message: "connect database failed", info: mysql!.errorMessage())
         }
         
         let getQuery = mysql!.query(statement: """
@@ -155,10 +169,10 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
-        let changeQuery = mysql!.query(statement: """
+        let updateQuery = mysql!.query(statement: """
             UPDATE `user` SET `user_name`='\(vo.userName)', `gender`=\(vo.gender), `introduction`='\(vo.introduction)' WHERE `user_id`='\(vo.userID)'
             """)
-        guard changeQuery else{
+        guard updateQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
@@ -194,10 +208,10 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: " old password wrong", info: "")
         }
         
-        let changeQuery = mysql!.query(statement: """
+        let updateQuery = mysql!.query(statement: """
             UPDATE `user` SET `password`='\(vo.newPass)' WHERE `phone`='\(vo.phone)'
             """)
-        guard changeQuery else{
+        guard updateQuery else{
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         

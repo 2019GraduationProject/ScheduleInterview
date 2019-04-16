@@ -15,4 +15,8 @@ protocol OrderService {
     func cancelInGroupClause(vo: GroupOrderID) -> ReturnGenericity<String>
     
     func cancelGlobalClause(vo: GlobalOrderID) -> ReturnGenericity<String>
+    
+    func getGroupOrders(vo: UserID) -> ReturnGenericity<[GroupOrderInfo]>
+    
+    func getGlobalOrders(vo: UserID) -> ReturnGenericity<[GlobalOrderInfo]>
 }

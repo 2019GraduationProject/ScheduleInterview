@@ -20,6 +20,14 @@ struct Group {
     }
 }
 
+struct GroupName {
+    var groupName: String
+    
+    init(groupName: String) {
+        self.groupName = groupName
+    }
+}
+
 struct GroupInfo {
     var groupID: String
     var creatorID: String

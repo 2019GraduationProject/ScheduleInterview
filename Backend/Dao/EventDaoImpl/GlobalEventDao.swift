@@ -112,7 +112,7 @@ class EventGlobalDaoImpl: EventDao{
         
         let changeQuery = mysql!.query(statement: """
             UPDATE `event_global_\(vo.eventID)`
-            SET `clause_name` = '\(vo.clauseName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)', ` introduction` = '\(vo.introduction)'
+            SET `clause_name` = '\(vo.clauseName)', `start_time` = '\(vo.startTime)', `end_time` = '\(vo.endTime)',`auth_level`='\(vo.globalAuthLevel!.getValue())', `introduction` = '\(vo.introduction)', `limit`='\(vo.limit)'
             WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard changeQuery else {
@@ -154,16 +154,15 @@ class EventGlobalDaoImpl: EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `event_global` WHERE `event_id` = '\(vo.eventID)'
+            DELETE `event_global`, `order_global` FROM `event_group`
+            LEFT JOIN `order_global` ON `event_global`.`event_id`=`order_global`.`event_id`
+            WHERE `event_id` = '\(vo.eventID)'
             """)
-        guard deleteQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
         
-        let deleteTableQuery = mysql!.query(statement: """
+        let dropQuery = mysql!.query(statement: """
             DROP TABLE `event_global_\(vo.eventID)`
             """)
-        guard deleteTableQuery else {
+        guard deleteQuery && dropQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
@@ -181,7 +180,9 @@ class EventGlobalDaoImpl: EventDao{
         }
         
         let deleteQuery = mysql!.query(statement: """
-            DELETE FROM `event_global_\(vo.eventID)` WHERE `clause_id` = '\(vo.clauseID)'
+            DELETE `event_global_\(vo.eventID)`,`order_global` FROM `event_global_\(vo.eventID)`
+            LEFT JOIN `order_global` ON `event_global_\(vo.eventID)`.`clause_id`=`order_global`.`clause_id`
+            WHERE `clause_id` = '\(vo.clauseID)'
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())

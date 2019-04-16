@@ -18,9 +18,8 @@ struct Clause {
     var introduction: String
     var limit: Int
     var total: Int
-    var members: String
     
-    init(clauseID:String, clauseName: String, startTime: String, endTime: String, groupAuthLevel: GroupAuthLevel?, globalAuthLevel: GlobalAuthLevel?,introduction: String, limit: Int, total: Int, members: String) {
+    init(clauseID:String, clauseName: String, startTime: String, endTime: String, groupAuthLevel: GroupAuthLevel?, globalAuthLevel: GlobalAuthLevel?,introduction: String, limit: Int, total: Int) {
         self.clauseID = clauseID
         self.clauseName = clauseName
         self.startTime = startTime
@@ -30,7 +29,6 @@ struct Clause {
         self.introduction = introduction
         self.limit = limit
         self.total = total
-        self.members = members
     }
 }
 

@@ -117,7 +117,7 @@ class OrderDao{
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         let getIDQuery = mysql!.query(statement: """
-            SELECT `order_id` FROM `order_group`
+            SELECT `order_id` FROM `order_global`
             WHERE `user_id`='\(vo.userID)' AND `event_id`='\(vo.eventID)' AND `clause_id`='\(vo.clauseID)'
             """)
         guard getIDQuery else{

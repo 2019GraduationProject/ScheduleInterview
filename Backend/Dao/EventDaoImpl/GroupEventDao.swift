@@ -271,7 +271,7 @@ class EventGroupDaoImpl : EventDao{
         }
         
         let getQuery = mysql!.query(statement: """
-            SELECT * FROM `event_group` WHERE `time`>'\(TimeTool.getCurrentDay())' `group_id` IN (
+            SELECT * FROM `event_group` WHERE `time`>'\(TimeTool.getCurrentDay())' AND `group_id` IN (
             SELECT `group_id` FROM `invitation_accept` WHERE `user_id` = '\(vo.userID)')
             """)
         guard getQuery else{
@@ -321,8 +321,9 @@ class EventGroupDaoImpl : EventDao{
             clause.startTime = row[2]!
             clause.endTime = row[3]!
             clause.groupAuthLevel = GroupAuthLevel(rawValue: Int(row[4]!)!)
-            clause.limit = Int(row[5]!)!
-            clause.total = Int(row[6]!)!
+            clause.introduction = row[5]!
+            clause.limit = Int(row[6]!)!
+            clause.total = Int(row[7]!)!
             clauses.append(clause)
         })
         

@@ -315,8 +315,9 @@ class EventGlobalDaoImpl: EventDao{
             clause.startTime = row[2]!
             clause.endTime = row[3]!
             clause.globalAuthLevel = GlobalAuthLevel(rawValue: Int(row[4]!)!)
-            clause.limit = Int(row[5]!)!
-            clause.total = Int(row[6]!)!
+            clause.introduction = row[5]!
+            clause.limit = Int(row[6]!)!
+            clause.total = Int(row[7]!)!
             clauses.append(clause)
         })
         

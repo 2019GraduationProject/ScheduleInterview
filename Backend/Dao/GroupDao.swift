@@ -288,7 +288,7 @@ class GroupDao{
             DELETE `group_\(vo.groupID)`, `invitation_accept`, `order_group` FROM `group_\(vo.groupID)`
             LEFT JOIN `invitation_accept` ON `group_\(vo.groupID)`.`user_id`=`invitation_accept`.`user_id`
             LEFT JOIN `order_group` ON `group_\(vo.groupID)`.`user_id`=`order_group`.`user_id`
-            WHERE `user_id` = '\(vo.userID)';
+            WHERE `group_\(vo.groupID)`.`user_id` = '\(vo.userID)';
             """)
         var dropQuery = true
         for eventID in events {

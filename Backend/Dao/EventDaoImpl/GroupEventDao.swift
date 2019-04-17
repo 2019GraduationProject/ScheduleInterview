@@ -157,7 +157,7 @@ class EventGroupDaoImpl : EventDao{
         let deleteQuery = mysql!.query(statement: """
             DELETE `event_group`, `order_group` FROM `event_group`
             LEFT JOIN `order_group` ON `event_group`.`event_id`=`order_group`.`event_id`
-            WHERE `event_id` = '\(vo.eventID)'
+            WHERE `event_group`.`event_id` = '\(vo.eventID)'
             """)
         
         let dropQuery = mysql!.query(statement: """
@@ -183,7 +183,7 @@ class EventGroupDaoImpl : EventDao{
         let deleteQuery = mysql!.query(statement: """
             DELETE `event_group_\(vo.eventID)`,`order_group` FROM `event_group_\(vo.eventID)`
             LEFT JOIN `order_group` ON `event_group_\(vo.eventID)`.`clause_id`=`order_group`.`clause_id`
-            WHERE `clause_id` = '\(vo.clauseID)'
+            WHERE `event_group_\(vo.eventID)`.`clause_id` = '\(vo.clauseID)'
             """)
         guard deleteQuery else {
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())

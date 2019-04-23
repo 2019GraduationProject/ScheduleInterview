@@ -20,6 +20,11 @@ class OrderDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
         
         let getQuery = mysql!.query(statement: """
             SELECT `limit`, `total` FROM `event_group_\(vo.eventID)` WHERE `clause_id`='\(vo.clauseID)'
@@ -44,15 +49,15 @@ class OrderDao{
         let updateQuery = mysql!.query(statement: """
             UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)' WHERE `clause_id`='\(vo.clauseID)'
             """)
-        guard updateQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
-        
+
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `order_group` (`user_id`, `group_id`, `event_id`, `clause_id`)
             VALUES ('\(vo.userID)', '\(vo.groupID)', '\(vo.eventID)', '\(vo.clauseID)')
             """)
-        guard insertQuery else{
+        guard updateQuery && insertQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         let getIDQuery = mysql!.query(statement: """
@@ -60,6 +65,9 @@ class OrderDao{
             WHERE `user_id`='\(vo.userID)' AND `group_id`='\(vo.groupID)' AND `event_id`='\(vo.eventID)' AND `clause_id`='\(vo.clauseID)'
             """)
         guard getIDQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         let ress = mysql!.storeResults()!
@@ -67,7 +75,12 @@ class OrderDao{
         ress.forEachRow { row in
             orderID = row.first!!
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: orderID)
     }
     
@@ -81,7 +94,11 @@ class OrderDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
-        
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
         let getQuery = mysql!.query(statement: """
             SELECT `limit`, `total` FROM `event_global_\(vo.eventID)` WHERE `clause_id`='\(vo.clauseID)'
             """)
@@ -105,15 +122,15 @@ class OrderDao{
         let updateQuery = mysql!.query(statement: """
             UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)' WHERE `clause_id`='\(vo.clauseID)'
             """)
-        guard updateQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
         
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `order_global` (`user_id`, `event_id`, `clause_id`)
             VALUES ('\(vo.userID)', '\(vo.eventID)', '\(vo.clauseID)')
             """)
-        guard insertQuery else{
+        guard updateQuery && insertQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         let getIDQuery = mysql!.query(statement: """
@@ -121,6 +138,9 @@ class OrderDao{
             WHERE `user_id`='\(vo.userID)' AND `event_id`='\(vo.eventID)' AND `clause_id`='\(vo.clauseID)'
             """)
         guard getIDQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         let ress = mysql!.storeResults()!
@@ -128,7 +148,12 @@ class OrderDao{
         ress.forEachRow { row in
             orderID = row.first!!
         }
-
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         
         return ReturnGenericity<String>(state: true, message: "success", info: orderID)
     }
@@ -143,7 +168,11 @@ class OrderDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
-        
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
         let getQuery = mysql!.query(statement: """
             SELECT `total` FROM `event_group_\(vo.eventID)` WHERE `clause_id`  = '\(vo.clauseID)'
         """)
@@ -161,17 +190,22 @@ class OrderDao{
         let cutQuery = mysql!.query(statement: """
             UPDATE `event_group_\(vo.eventID)` SET `total` = '\(total)' WHERE `clause_id`='\(vo.clauseID)'
             """)
-        guard cutQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
         
         let deleteQuery = mysql!.query(statement: """
             DELETE FROM `order_group` WHERE `order_id` = '\(vo.orderID)'
             """)
-        guard deleteQuery else{
+        guard cutQuery && deleteQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
         
     }
@@ -186,7 +220,11 @@ class OrderDao{
         if mysql == nil{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
-        
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
         let getQuery = mysql!.query(statement: """
             SELECT `total` FROM `event_global_\(vo.eventID)` WHERE `clause_id`  = '\(vo.clauseID)'
             """)
@@ -204,17 +242,21 @@ class OrderDao{
         let cutQuery = mysql!.query(statement: """
             UPDATE `event_global_\(vo.eventID)` SET `total` = '\(total)' WHERE `clause_id`='\(vo.clauseID)'
             """)
-        guard cutQuery else{
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
-        
         let deleteQuery = mysql!.query(statement: """
             DELETE FROM `order_global` WHERE `order_id` = '\(vo.orderID)'
             """)
-        guard deleteQuery else{
+        guard cutQuery && deleteQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     

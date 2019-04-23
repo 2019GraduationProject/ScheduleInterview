@@ -21,6 +21,12 @@ class EventGlobalDaoImpl: EventDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let createQuery = mysql!.query(statement: """
             INSERT INTO `event_global` (`publisher_id`, `event_name`, `time`, `location`)
             VALUES ('\(vo.publisherID)','\(vo.eventName)', '\(vo.time)', '\(vo.location)')
@@ -33,6 +39,9 @@ class EventGlobalDaoImpl: EventDao{
             SELECT `event_id` FROM `event_global` WHERE `event_name` = '\(vo.eventName)'
             """)
         guard getQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "wrong", info: mysql!.errorMessage())
         }
         
@@ -56,25 +65,27 @@ class EventGlobalDaoImpl: EventDao{
             PRIMARY KEY (`clause_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
             """)
-        guard createGlobalEventQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: "")
-        }
-        
+
         var initQuery: Bool = true
         for clause in vo.clauses {
-            initQuery = mysql!.query(statement: """
-                INSERT INTO `event_global_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.globalAuthLevel!.getValue())', '\(clause.introduction)', '\(clause.limit)');
-                """)
+            initQuery = initQuery && insertClause(vo: clause, mysql: mysql).state
             if !initQuery{
                 break
             }
         }
         
-        guard initQuery else {
+        guard createGlobalEventQuery && initQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     
@@ -126,10 +137,13 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: clause info
     /// - Returns: success/fail
-    func insertClause(vo: NewClause) -> ReturnGenericity<String> {
-        let mysql: MySQL? = connector.connected()
-        if mysql == nil{
-            return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+    func insertClause(vo: NewClause, mysql: MySQL? = nil) -> ReturnGenericity<String> {
+        var mysql: MySQL? = mysql
+        if mysql == nil {
+            mysql = connector.connected()
+            if mysql == nil{
+                return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+            }
         }
         
         let insertQuery = mysql!.query(statement: """
@@ -147,10 +161,19 @@ class EventGlobalDaoImpl: EventDao{
     ///
     /// - Parameter vo: global event ID
     /// - Returns: success/fail
-    func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
-        let mysql: MySQL? = connector.connected()
-        if mysql == nil{
-            return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+    func deleteEvent(vo: EventID, mysql: MySQL? = nil) -> ReturnGenericity<String> {
+        var mysql: MySQL? = mysql
+        if mysql == nil {
+            mysql = connector.connected()
+            if mysql == nil{
+                return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+            }
+        }
+        
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
         }
         
         let deleteQuery = mysql!.query(statement: """
@@ -163,9 +186,17 @@ class EventGlobalDaoImpl: EventDao{
             DROP TABLE `event_global_\(vo.eventID)`
             """)
         guard deleteQuery && dropQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     

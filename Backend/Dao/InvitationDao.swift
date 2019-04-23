@@ -45,25 +45,35 @@ class InvitationDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let addQuery = mysql!.query(statement: """
             INSERT INTO `invitation_accept` (`invitation_id`, `group_id`, `user_id`) VALUES ('\(vo.invitationID)', '\(vo.groupID)','\(vo.userID)')
             """)
-        guard addQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
         
         let addUserQuery = mysql!.query(statement: """
             INSERT INTO `group_\(vo.groupID)`(`user_id`, `auth_level`) VALUES ('\(vo.userID)', '\(GroupAuthLevel.MEMBER.getValue())')
             """)
-        guard addUserQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
         
         let deleteQuery = mysql!.query(statement: """
             DELETE FROM `invitation` WHERE `invitation_id` = '\(vo.invitationID)'
             """)
-        guard deleteQuery else{
+        
+        guard addQuery && addUserQuery && deleteQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -80,20 +90,31 @@ class InvitationDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let addQuery = mysql!.query(statement: """
             INSERT INTO `invitation_refuse` (`invitation_id`, `group_id`, `user_id`) VALUES ('\(vo.invitationID)', '\(vo.groupID)','\(vo.userID)')
             """)
-        guard addQuery else{
-            return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
-        }
         
         let handleQuery = mysql!.query(statement: """
             DELETE FROM `invitation` WHERE `invitation_id` = '\(vo.invitationID)';
             """)
-        guard handleQuery else{
+        guard addQuery && handleQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
-        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
     

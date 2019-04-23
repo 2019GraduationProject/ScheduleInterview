@@ -32,11 +32,11 @@ class EventServiceImpl: EventService{
     }
     
     func addClause(vo: NewClause) -> ReturnGenericity<String> {
-        return eventDao.insertClause(vo: vo)
+        return eventDao.insertClause(vo: vo, mysql: nil)
     }
 
     func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
-        return eventDao.deleteEvent(vo: vo)
+        return eventDao.deleteEvent(vo: vo, mysql: nil)
     }
     
     func deleteClause(vo: ClauseID) -> ReturnGenericity<String> {

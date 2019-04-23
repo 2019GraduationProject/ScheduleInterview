@@ -21,6 +21,12 @@ class EventGroupDaoImpl : EventDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let createQuery = mysql!.query(statement: """
             INSERT INTO `event_group` (`group_id`, `publisher_id`, `event_name`, `time`, `location`)
             VALUES ('\(vo.groupID!)', '\(vo.publisherID)','\(vo.eventName)', '\(vo.time)', '\(vo.location)')
@@ -33,6 +39,9 @@ class EventGroupDaoImpl : EventDao{
             SELECT `event_id` FROM `event_group` WHERE `group_id`='\(vo.groupID!)' AND `event_name` = '\(vo.eventName)'
             """)
         guard getQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "wrong", info: mysql!.errorMessage())
         }
         
@@ -42,7 +51,7 @@ class EventGroupDaoImpl : EventDao{
             eventID = row.first!!
         }
         
-        let createInGroupEventQuery = mysql!.query(statement: """
+        let createGroupEventQuery = mysql!.query(statement: """
             CREATE TABLE `event_group_\(eventID)` (
             `clause_id` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
             `clause_name` varchar(256) NOT NULL DEFAULT '',
@@ -56,23 +65,27 @@ class EventGroupDaoImpl : EventDao{
             PRIMARY KEY (`clause_id`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
             """)
-        guard createInGroupEventQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
         
         var initQuery: Bool = true
         for clause in vo.clauses {
-            initQuery = mysql!.query(statement: """
-                INSERT INTO `event_group_\(eventID)` (`clause_name`, `start_time`, `end_time`, `auth_level`, `introduction`, `limit`)
-                VALUES ('\(clause.clauseName)', '\(clause.startTime)', '\(clause.endTime)', '\(clause.groupAuthLevel!.getValue())', '\(clause.introduction)', '\(clause.limit)');
-                """)
+            initQuery = initQuery && insertClause(vo: clause, mysql: mysql).state
             if !initQuery{
                 break
             }
         }
         
-        guard initQuery else {
+        guard createGroupEventQuery && initQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -127,10 +140,13 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: clause info
     /// - Returns: success/fail
-    func insertClause(vo: NewClause) -> ReturnGenericity<String> {
-        let mysql: MySQL? = connector.connected()
-        if mysql == nil{
-            return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+    func insertClause(vo: NewClause, mysql: MySQL? = nil) -> ReturnGenericity<String> {
+        var mysql: MySQL? = mysql
+        if mysql == nil {
+            mysql = connector.connected()
+            if mysql == nil{
+                return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+            }
         }
         
         let insertQuery = mysql!.query(statement: """
@@ -148,10 +164,19 @@ class EventGroupDaoImpl : EventDao{
     ///
     /// - Parameter vo: group event ID
     /// - Returns: success/fail
-    func deleteEvent(vo: EventID) -> ReturnGenericity<String> {
-        let mysql: MySQL? = connector.connected()
-        if mysql == nil{
-            return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+    func deleteEvent(vo: EventID, mysql: MySQL? = nil) -> ReturnGenericity<String> {
+        var mysql: MySQL? = mysql
+        if mysql == nil {
+            mysql = connector.connected()
+            if mysql == nil{
+                return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
+            }
+        }
+        
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
         }
         
         let deleteQuery = mysql!.query(statement: """
@@ -164,7 +189,17 @@ class EventGroupDaoImpl : EventDao{
             DROP TABLE `event_group_\(vo.eventID)`
             """)
         guard deleteQuery && dropQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
+        }
+        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")

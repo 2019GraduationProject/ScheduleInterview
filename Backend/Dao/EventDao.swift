@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import PerfectMySQL
 
 protocol EventDao{
     func insertEvent(vo: NewEvent) -> ReturnGenericity<String>
@@ -14,9 +15,9 @@ protocol EventDao{
     
     func updateClause(vo: UpdateClause) -> ReturnGenericity<String>
     
-    func insertClause(vo: NewClause) -> ReturnGenericity<String>
+    func insertClause(vo: NewClause, mysql: MySQL?) -> ReturnGenericity<String>
     
-    func deleteEvent(vo: EventID) -> ReturnGenericity<String>
+    func deleteEvent(vo: EventID, mysql: MySQL?) -> ReturnGenericity<String>
     
     func deleteClause(vo: ClauseID) -> ReturnGenericity<String>
     

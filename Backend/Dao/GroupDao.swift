@@ -21,6 +21,12 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let createQuery = mysql!.query(statement: """
             INSERT INTO `group` (`creator_id`, `group_name`) VALUES (\(vo.creatorID), '\(vo.groupName)')
             """)
@@ -32,6 +38,9 @@ class GroupDao{
             SELECT `group_id` FROM `group` WHERE `group_name`='\(vo.groupName)'
             """)
         guard getQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
         }
         
@@ -51,17 +60,25 @@ class GroupDao{
                 UNIQUE KEY `user_id` (`user_id`)
             ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
             """)
-        guard createGroupQuery else {
-            return ReturnGenericity<String>(state: false, message: "database wrong", info: mysql!.errorMessage())
-        }
         
         //add creator
         let insertQuery = mysql!.query(statement: """
             INSERT INTO `group_\(groupID)` (`user_id`, `auth_level`) VALUES (\(vo.creatorID), '\(GroupAuthLevel.CREATOR.getValue())')
             """)
-        guard insertQuery else {
-            return ReturnGenericity<String>(state: false, message: "group exist", info: mysql!.errorMessage())
+        guard createGroupQuery && insertQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
+            return ReturnGenericity<String>(state: false, message: "wrong", info: mysql!.errorMessage())
         }
+        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
+
         
         return ReturnGenericity<String>(state: true, message: "success", info: groupID)
     }
@@ -225,10 +242,19 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let getQuery = mysql!.query(statement: """
             SELECT `event_id` FROM `event_group` WHERE `group_id` = '\(vo.groupID)'
             """)
         guard getQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
@@ -252,7 +278,17 @@ class GroupDao{
             DROP TABLE `group_\(vo.groupID)` \(dropString)
             """)
         guard deleteQuery&&dropQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")
@@ -269,10 +305,19 @@ class GroupDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let getQuery = mysql!.query(statement: """
             SELECT `event_id` FROM `event_group` WHERE `publisher_id` = '\(vo.userID)'
             """)
         guard getQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
@@ -292,10 +337,23 @@ class GroupDao{
             """)
         var dropQuery = true
         for eventID in events {
-            dropQuery = dropQuery && eventDao.deleteEvent(vo: EventID(eventID: eventID)).state
+            dropQuery = dropQuery && eventDao.deleteEvent(vo: EventID(eventID: eventID), mysql: mysql).state
+            if !dropQuery{
+                break
+            }
         }
         guard deleteQuery&&dropQuery else{
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
+        }
+        
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
         }
         
         return ReturnGenericity<String>(state: true, message: "success", info: "")

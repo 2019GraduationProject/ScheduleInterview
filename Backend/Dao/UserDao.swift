@@ -190,6 +190,12 @@ class UserDao{
             return ReturnGenericity<String>(state: false, message: "connect database failed", info: "")
         }
         
+        //transaction
+        let transaction: Transaction = Transaction(mysql: mysql!)
+        guard transaction.beginTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "begin transaction failed", info: "")
+        }
+        
         let getQuery = mysql!.query(statement: """
             SELECT `password` FROM `user` WHERE `phone`='\(vo.phone)'
             """)
@@ -211,10 +217,19 @@ class UserDao{
         let updateQuery = mysql!.query(statement: """
             UPDATE `user` SET `password`='\(vo.newPass)' WHERE `phone`='\(vo.phone)'
             """)
-        guard updateQuery else{
+        guard updateQuery else {
+            guard transaction.rollback() else {
+                return ReturnGenericity<String>(state: false, message: "rollback transaction failed", info: "")
+            }
             return ReturnGenericity<String>(state: false, message: "Wrong", info: mysql!.errorMessage())
         }
         
+        guard transaction.commit() else {
+            return ReturnGenericity<String>(state: false, message: "commit transaction failed", info: "")
+        }
+        guard transaction.endTransaction() else {
+            return ReturnGenericity<String>(state: false, message: "ends transaction failed", info: "")
+        }
         return ReturnGenericity<String>(state: true, message: "success", info: "")
     }
 
